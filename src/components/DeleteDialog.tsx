@@ -21,13 +21,13 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ product, onConfirm, onCance
         <div className="flex justify-end space-x-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
           >
             Hủy
           </button>
           <button
             onClick={() => onConfirm(product.id)}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer"
           >
             Xóa
           </button>

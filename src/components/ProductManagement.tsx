@@ -150,7 +150,7 @@ const ProductManagement: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-800">Quản lý Sản phẩm</h2>
         <button
           onClick={handleAddProduct}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
         >
           <Plus size={20} />
           <span>Thêm sản phẩm</span>

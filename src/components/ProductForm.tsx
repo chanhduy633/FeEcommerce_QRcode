@@ -157,7 +157,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
           >
             <option value="">Chọn danh mục</option>
             <option value="Điện thoại">Điện thoại</option>
@@ -181,7 +181,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <button
                 type="button"
                 onClick={handleRemoveImage}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -226,13 +226,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
       <div className="flex justify-end space-x-3 pt-4">
         <button
           onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
         >
           Hủy
         </button>
         <button
           onClick={handleSubmit}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer "
         >
           {product ? "Cập nhật" : "Thêm mới"}
         </button>

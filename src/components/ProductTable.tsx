@@ -77,13 +77,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 <td className="px-6 py-4 text-right text-sm font-medium">
                   <button
                     onClick={() => onEdit(product)}
-                    className="text-blue-600 hover:text-blue-900 mr-3"
+                    className="text-blue-600 hover:text-blue-900 mr-3 cursor-pointer"
                   >
                     <Edit size={18} />
                   </button>
                   <button
                     onClick={() => onDelete(product)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-red-600 hover:text-red-900 cursor-pointer"
                   >
                     <Trash2 size={18} />
                   </button>

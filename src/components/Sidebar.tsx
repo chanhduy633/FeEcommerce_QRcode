@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <h1 className="text-xl font-bold">Admin Panel</h1>
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="lg:hidden text-white hover:text-gray-300"
+            className="lg:hidden text-white hover:text-gray-300 cursor-pointer"
           >
             <X size={24} />
           </button>
@@ -54,7 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   setActiveTab(item.id);
                   setIsMobileOpen(false);
                 }}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition-colors cursor-pointer ${
                   activeTab === item.id
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-300 hover:bg-slate-800'
