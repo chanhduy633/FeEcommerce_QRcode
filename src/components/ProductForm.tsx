@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import type { Product } from "../types/Product";
 import { Upload, X } from "lucide-react";
+import { API_ROUTES } from "../config/api";
 
 interface ProductFormProps {
   product: Product | null;
@@ -47,9 +48,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
         return;
       }
 
-      // Kiểm tra kích thước (max 1MB)
-      if (file.size > 1024 * 1024) {
-        alert("Kích thước ảnh không được vượt quá 1MB!");
+      // Kiểm tra kích thước (max 5MB)
+      if (file.size > 5* 1024 * 1024) {
+        alert("Kích thước ảnh không được vượt quá 5MB!");
         return;
       }
 
@@ -80,7 +81,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     formData.append("folder", "products"); // Tùy chọn: thư mục lưu trữ
 
     try {
-      const response = await fetch("http://localhost:5317/api/upload", {
+      const response = await fetch(API_ROUTES.UPLOAD, {
         method: "POST",
         body: formData,
       });
@@ -241,7 +242,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           >
             <Upload size={20} className="text-gray-400 mb-2" />
             <p className="text-xs text-gray-500">Tải ảnh lên</p>
-            <p className="text-xs text-gray-400 mt-1">Max 1MB</p>
+            <p className="text-xs text-gray-400 mt-1">Max 5MB</p>
           </div>
         )}
 

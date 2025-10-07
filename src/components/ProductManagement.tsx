@@ -5,6 +5,7 @@ import ProductTable from "../components/ProductTable";
 import ProductForm from "../components/ProductForm";
 import DeleteDialog from "../components/DeleteDialog";
 import type  { Product, ProductFromAPI } from "../types/Product";
+import { API_ROUTES } from "../config/api";
 
 const ProductManagement: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -17,7 +18,7 @@ const ProductManagement: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5317/api/products");
+        const res = await fetch(API_ROUTES.PRODUCTS);
         if (!res.ok) throw new Error("Không thể tải sản phẩm");
 
         const data: ProductFromAPI[] = await res.json();
@@ -63,7 +64,7 @@ const ProductManagement: React.FC = () => {
   try {
     if (editingProduct) {
       const res = await fetch(
-        `http://localhost:5317/api/products/${editingProduct.id}`,
+        `${API_ROUTES.PRODUCTS}/${editingProduct.id}`,
         {
           method: "PUT",
           headers: {
@@ -86,7 +87,7 @@ const ProductManagement: React.FC = () => {
       );
       toast.success("Cập nhật sản phẩm thành công!");
     } else {
-      const res = await fetch("http://localhost:5317/api/products", {
+      const res = await fetch(API_ROUTES.PRODUCTS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +115,7 @@ const ProductManagement: React.FC = () => {
   const token = localStorage.getItem("token"); // 🟢 Lấy token
 
   try {
-    const res = await fetch(`http://localhost:5317/api/products/${id}`, {
+    const res = await fetch(`${API_ROUTES.PRODUCTS}/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`, // 🟢 Gửi token
