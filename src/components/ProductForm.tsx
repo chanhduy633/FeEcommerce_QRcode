@@ -34,6 +34,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [previewImage, setPreviewImage] = useState<string>(
     product?.image_url || ""
   );
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,16 +53,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
         return;
       }
 
-      // Đọc file và chuyển thành base64
+      // Lưu file để upload sau
+      setSelectedFile(file);
+
+      // Tạo preview local
       const reader = new FileReader();
-      reader.onloadstart = () => console.log("Đang đọc file...");
-      reader.onerror = () => console.error("Lỗi khi đọc file:", reader.error);
       reader.onloadend = () => {
-        console.log("Đọc xong file");
-        const base64String = reader.result as string;
-        console.log("Base64 length:", base64String.length);
-        setPreviewImage(base64String);
-        setFormData({ ...formData, image_url: base64String });
+        setPreviewImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -68,26 +67,71 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const handleRemoveImage = () => {
     setPreviewImage("");
+    setSelectedFile(null);
     setFormData({ ...formData, image_url: "" });
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const handleSubmit = () => {
+  const uploadImage = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("folder", "products"); // Tùy chọn: thư mục lưu trữ
+
+    try {
+      const response = await fetch("http://localhost:5317/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+      return data.url; // URL của ảnh từ server
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async () => {
     if (
-      formData.name &&
-      formData.price &&
-      formData.category &&
-      formData.stock &&
-      formData.description
+      !formData.name ||
+      !formData.price ||
+      !formData.category ||
+      !formData.stock ||
+      !formData.description
     ) {
+      alert("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      let imageUrl = formData.image_url;
+
+      // Nếu có file mới được chọn, upload lên server
+      if (selectedFile) {
+        imageUrl = await uploadImage(selectedFile);
+      }
+
+      // Gọi onSave với URL từ server
       onSave({
         ...formData,
         price: Number(formData.price),
         stock: Number(formData.stock),
         sold: Number(formData.sold),
+        image_url: imageUrl,
       });
+    } catch (error) {
+      alert("Có lỗi xảy ra khi upload ảnh!");
+      console.error(error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -135,6 +179,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           />
         </div>
       </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -166,47 +211,48 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <option value="Tablet">Tablet</option>
           </select>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Hình ảnh sản phẩm
-          </label>
+      </div>
 
-          {previewImage ? (
-            <div className="relative inline-block">
-              <img
-                src={previewImage}
-                alt="Preview"
-                className="w-28 h-28 object-cover rounded-lg border-2 border-gray-300"
-              />
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors cursor-pointer"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ) : (
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="w-28 h-28 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors"
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Hình ảnh sản phẩm
+        </label>
+
+        {previewImage ? (
+          <div className="relative inline-block">
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="w-28 h-28 object-cover rounded-lg border-2 border-gray-300"
+            />
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              disabled={isUploading}
+              className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors cursor-pointer disabled:opacity-50"
             >
-              <Upload size={20} className="text-gray-400 mb-2" />
-              <p className="text-sm text-gray-500">Nhấn để tải ảnh lên</p>
-              <p className="text-xs text-gray-400 mt-1">
-                PNG, JPG, GIF (max 1MB)
-              </p>
-            </div>
-          )}
+              <X size={16} />
+            </button>
+          </div>
+        ) : (
+          <div
+            onClick={() => !isUploading && fileInputRef.current?.click()}
+            className="w-28 h-28 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors"
+          >
+            <Upload size={20} className="text-gray-400 mb-2" />
+            <p className="text-xs text-gray-500">Tải ảnh lên</p>
+            <p className="text-xs text-gray-400 mt-1">Max 1MB</p>
+          </div>
+        )}
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="hidden"
-          />
-        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          disabled={isUploading}
+          className="hidden"
+        />
       </div>
 
       <div>
@@ -226,15 +272,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
       <div className="flex justify-end space-x-3 pt-4">
         <button
           onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          disabled={isUploading}
+          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
         >
           Hủy
         </button>
         <button
           onClick={handleSubmit}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer "
+          disabled={isUploading}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50"
         >
-          {product ? "Cập nhật" : "Thêm mới"}
+          {isUploading ? "Đang xử lý..." : product ? "Cập nhật" : "Thêm mới"}
         </button>
       </div>
     </div>
