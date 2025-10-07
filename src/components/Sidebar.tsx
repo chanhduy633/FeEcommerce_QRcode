@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Package, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package,  X } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
