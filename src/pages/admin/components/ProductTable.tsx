@@ -1,6 +1,6 @@
 import React from "react";
 import { Edit, Trash2 } from "lucide-react";
-import type { Product } from "../types/Product";
+import type { Product } from "../../../types/Product";
 
 interface ProductTableProps {
   products: Product[];

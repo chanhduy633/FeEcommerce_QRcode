@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Menu } from 'lucide-react';
-import Sidebar from '../components/Sidebar';
-import ProductManagement from '../components/ProductManagement';
-import Dashboard from '../components/Dashboard';
+import Dashboard from './components/Dashboard';
+import ProductManagement from './components/ProductManagement';
+import Sidebar from './components/Sidebar';
 
 const DashboardAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');

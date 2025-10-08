@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
-import type { Product } from "../types/Product";
+import type { Product } from "../../../types/Product";
 import { Upload, X } from "lucide-react";
-import { API_ROUTES } from "../config/api";
+import { API_ROUTES } from "../../../config/api";
 
 interface ProductFormProps {
   product: Product | null;
