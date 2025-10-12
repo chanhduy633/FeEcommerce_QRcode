@@ -1,16 +1,6 @@
 import React from "react";
 import { Package, Star } from "lucide-react";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  stock: number;
-  sold: number;
-  image_url?: string;
-}
+import type { Product } from "../../../types/Product";
 
 interface ProductCardProps {
   product: Product;

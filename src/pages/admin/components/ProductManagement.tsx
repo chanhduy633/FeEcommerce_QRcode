@@ -1,63 +1,26 @@
-// src/pages/admin/components/ProductManagement.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import { Plus, Search } from "lucide-react";
 import ProductTable from "./ProductTable";
 import ProductForm from "./ProductForm";
 import DeleteDialog from "./DeleteDialog";
-import type { Product } from "../../../types/Product";
-import { AdminProductViewModel } from "../../../domain/adminProductViewModel";
-
-const vm = new AdminProductViewModel();
+import { useProductManagementViewModel } from "../../../domain/useProductManagementViewModel";
 
 const ProductManagement: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<Product | null>(null);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      await vm.loadProducts();
-      setProducts(vm.products);
-      setLoading(false);
-    };
-    fetchProducts();
-  }, []);
-
-  const filteredProducts = useMemo(() => {
-    return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [products, searchTerm]);
-
-  const handleAdd = () => {
-    setEditingProduct(null);
-    setIsDialogOpen(true);
-  };
-
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setIsDialogOpen(true);
-  };
-
-  const handleSave = async (formData: Product) => {
-    if (editingProduct) await vm.updateProduct(editingProduct.id, formData);
-    else await vm.addProduct(formData);
-    setIsDialogOpen(false);
-    await vm.loadProducts();
-    setProducts(vm.products);
-  };
-
-  const handleDelete = async (id: string) => {
-    await vm.deleteProduct(id);
-    setProducts(vm.products);
-    setDeleteConfirm(null);
-  };
+  const {
+    loading,
+    products,
+    searchTerm,
+    setSearchTerm,
+    isDialogOpen,
+    setIsDialogOpen,
+    editingProduct,
+    deleteConfirm,
+    setDeleteConfirm,
+    handleAdd,
+    handleEdit,
+    handleSave,
+    handleDelete,
+  } = useProductManagementViewModel();
 
   if (loading) return <div className="text-center py-10">Đang tải sản phẩm...</div>;
 
@@ -67,7 +30,7 @@ const ProductManagement: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-800">Quản lý Sản phẩm</h2>
         <button
           onClick={handleAdd}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition"
         >
           <Plus size={20} />
           <span>Thêm sản phẩm</span>
@@ -85,7 +48,7 @@ const ProductManagement: React.FC = () => {
         />
       </div>
 
-      <ProductTable products={filteredProducts} onEdit={handleEdit} onDelete={setDeleteConfirm} />
+      <ProductTable products={products} onEdit={handleEdit} onDelete={setDeleteConfirm} />
 
       {isDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">

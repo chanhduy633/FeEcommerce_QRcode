@@ -21,3 +21,5 @@ export interface ProductFromAPI {
   createdAt?: string;
   updatedAt?: string;
 }
+
+
