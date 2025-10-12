@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Search, Package } from "lucide-react";
 import { toast } from "sonner";
 import Header from "./components/Header";
@@ -7,21 +7,24 @@ import ProductCard from "./components/ProductCard";
 import Pagination from "../admin/components/Pagination";
 import SidebarHome from "./components/SidebarHome";
 import Footer from "./components/Footer";
-import { useProducts } from "../../hooks/useProducts";
+import { ProductViewModel } from "../../domain/productViewmodel";
+import type { Product } from "../../types/Product";
 
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  stock: number;
-  sold: number;
-  image_url?: string;
-}
+const vm = new ProductViewModel();
 
 const Homepage: React.FC = () => {
-  const { products, loading, error } = useProducts();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    vm.getAllProducts()
+      .then((data) => {
+        setProducts(data);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
   const categories = useMemo(() => {
     const unique = Array.from(new Set(products.map((p) => p.category)));
 
@@ -81,7 +84,7 @@ const Homepage: React.FC = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
+  
   const handleBuyNow = (product: Product) => {
     toast.success(`Mua ngay: ${product.name}`, {
       description: `Giá: ${product.price.toLocaleString("vi-VN")}₫`,
@@ -111,21 +114,9 @@ const Homepage: React.FC = () => {
     setSortBy(value);
     setCurrentPage(1);
   };
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen text-gray-500">
-        Đang tải sản phẩm...
-      </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen text-red-500">
-        {error}
-      </div>
-    );
-  }
+  if (loading) return <div>Đang tải sản phẩm...</div>;
+  if (error) return <div>Lỗi: {error}</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -202,7 +193,7 @@ const Homepage: React.FC = () => {
         </main>
       </div>
 
-      <Footer/>
+      <Footer />
     </div>
   );
 };
