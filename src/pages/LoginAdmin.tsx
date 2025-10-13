@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+// src/pages/LoginAdmin.tsx
+import React from "react";
+import { dependencies } from "../app/authDependencies";
+import { useAuthViewModel } from "../domain/authViewModel";
 import {
   Card,
   CardContent,
@@ -12,52 +13,16 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Button } from "../components/ui/button";
 
-const LoginAdmin = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch("http://localhost:5317/api/auth/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        const message = data.message || "Đăng nhập thất bại. Vui lòng thử lại.";
-        setError(message);
-        toast.error(message);
-        return;
-      }
-
-      const { token, user } = data;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      toast.success("Đăng nhập thành công!");
-
-      navigate("/admin/dashboard", { replace: true });
-    } catch {
-      const message = "Không thể kết nối đến máy chủ. Vui lòng thử lại.";
-      setError(message);
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+const LoginAdmin: React.FC = () => {
+  const {
+    email,
+    password,
+    loading,
+    error,
+    setEmail,
+    setPassword,
+    handleSubmit,
+  } = useAuthViewModel(dependencies.authRemote);
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-4 bg-background">
@@ -67,6 +32,7 @@ const LoginAdmin = () => {
             Đăng Nhập Admin
           </CardTitle>
         </CardHeader>
+
         <form onSubmit={handleSubmit}>
           <CardContent className="grid gap-4">
             {error && (
@@ -74,6 +40,7 @@ const LoginAdmin = () => {
                 {error}
               </div>
             )}
+
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -86,6 +53,7 @@ const LoginAdmin = () => {
                 required
               />
             </div>
+
             <div className="grid gap-2">
               <Label htmlFor="password">Mật khẩu</Label>
               <Input
@@ -99,6 +67,7 @@ const LoginAdmin = () => {
               />
             </div>
           </CardContent>
+
           <CardFooter>
             <Button
               type="submit"

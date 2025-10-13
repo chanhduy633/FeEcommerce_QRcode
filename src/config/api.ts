@@ -4,6 +4,7 @@ const API_BASE_URL =
 export const API_ROUTES = {
   UPLOAD: `${API_BASE_URL}/api/upload`,
   PRODUCTS: `${API_BASE_URL}/api/products`,
+  LOGIN : `${API_BASE_URL}/api/auth/admin/login`,
   // Thêm các endpoint khác ở đây
 };
 
