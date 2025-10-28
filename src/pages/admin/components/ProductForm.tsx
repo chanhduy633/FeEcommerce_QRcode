@@ -1,15 +1,15 @@
 import React, { useRef, useState } from "react";
-import type { Product } from "../../../types/Product";
+import type { IProduct } from "../../../types/Product";
 import { Upload, X } from "lucide-react";
 import { API_ROUTES } from "../../../config/api";
 
 interface ProductFormProps {
-  product: Product | null;
-  onSave: (formData: Product) => void;
+  product: IProduct | null;
+  onSave: (formData: IProduct) => void;
   onCancel: () => void;
 }
 
-type ProductFormData = Omit<Product, "price" | "stock" | "sold"> & {
+type ProductFormData = Omit<IProduct, "price" | "stock" | "sold"> & {
   price: string | number;
   stock: string | number;
   sold: string | number;

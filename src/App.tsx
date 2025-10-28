@@ -7,7 +7,10 @@ import Homepage from "./pages/homepage/HomePage";
 function App() {
   return (
     <div className="min-h-screen w-full bg-background">
-      <Toaster position="top-right" richColors />
+      <Toaster
+        position="top-right"
+        richColors
+      />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Homepage />} />

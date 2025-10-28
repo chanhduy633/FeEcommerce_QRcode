@@ -1,15 +1,19 @@
 // src/domain/authRemote.ts
 import { API_ROUTES } from "../../config/api";
 
-
 export interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
+  code: number;
+  data: {
+    success: boolean;
+    token: string;
+    user: {
+      id: string;
+      email: string;
+      full_name: string;
+      role: string;
+    };
   };
+  message: string;
 }
 
 export class AuthRemote {

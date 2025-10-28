@@ -1,13 +1,21 @@
 import { API_ROUTES } from "../../config/api";
-import type { Product, ProductFromAPI } from "../../types/Product";
-import type { AdminProductRemote } from "../remoteTypes";
+import type { IProduct, IProductFromAPI } from "../../types/Product";
+import type { ProductRemote } from "../remoteTypes";
+
+export interface AdminProductRemote extends ProductRemote {
+  create(product: IProduct): Promise<void>;
+  update(id: string, product: IProduct): Promise<void>;
+  delete(id: string): Promise<void>;
+}
 
 export class AdminProductRemoteV1 implements AdminProductRemote {
   private getToken() {
-    return localStorage.getItem("token");
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Token chưa tồn tại, vui lòng đăng nhập lại");
+    return token;
   }
 
-  private format(p: ProductFromAPI): Product {
+  private format(p: IProductFromAPI): IProduct {
     return {
       id: p._id,
       name: p.name,
@@ -20,73 +28,49 @@ export class AdminProductRemoteV1 implements AdminProductRemote {
     };
   }
 
-  async getAll(): Promise<Product[]> {
+  async getAll(): Promise<IProduct[]> {
     const res = await fetch(API_ROUTES.PRODUCTS);
     if (!res.ok) throw new Error("Không thể tải danh sách sản phẩm");
-
-    const data: ProductFromAPI[] = await res.json();
-    return data.map(this.format);
+    const json = await res.json();
+    return (json.data ?? []).map(this.format);
   }
 
-  async getById(id: string): Promise<Product> {
+  async getById(id: string): Promise<IProduct> {
     const res = await fetch(`${API_ROUTES.PRODUCTS}/${id}`);
     if (!res.ok) throw new Error("Không thể tải chi tiết sản phẩm");
-
-    const p: ProductFromAPI = await res.json();
-    return this.format(p);
+    const json = await res.json();
+    return this.format(json.data);
   }
 
-  async create(product: Product): Promise<void> {
-    const token = this.getToken();
+  async create(product: IProduct): Promise<void> {
     const res = await fetch(API_ROUTES.PRODUCTS, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${this.getToken()}`,
       },
       body: JSON.stringify(product),
     });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Create error:", errorText);
-      throw new Error("Không thể tạo sản phẩm");
-    }
-    // No return value needed for void
+    if (!res.ok) throw new Error("Không thể tạo sản phẩm");
   }
 
-  async update(id: string, product: Product): Promise<void> {
-    const token = this.getToken();
+  async update(id: string, product: IProduct): Promise<void> {
     const res = await fetch(`${API_ROUTES.PRODUCTS}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${this.getToken()}`,
       },
       body: JSON.stringify(product),
     });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Update error:", errorText);
-      throw new Error("Không thể cập nhật sản phẩm");
-    }
-    // No return value needed for void
+    if (!res.ok) throw new Error("Không thể cập nhật sản phẩm");
   }
 
   async delete(id: string): Promise<void> {
-    const token = this.getToken();
     const res = await fetch(`${API_ROUTES.PRODUCTS}/${id}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${this.getToken()}` },
     });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Delete error:", errorText);
-      throw new Error("Không thể xóa sản phẩm");
-    }
+    if (!res.ok) throw new Error("Không thể xóa sản phẩm");
   }
 }

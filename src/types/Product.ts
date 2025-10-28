@@ -1,4 +1,4 @@
-export interface Product {
+export interface IProduct {
   id: string;
   name: string;
   description: string;
@@ -9,7 +9,7 @@ export interface Product {
   image_url?: string;
 }
 
-export interface ProductFromAPI {
+export interface IProductFromAPI {
   _id: string;
   name: string;
   description?: string;

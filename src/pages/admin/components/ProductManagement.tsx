@@ -3,7 +3,7 @@ import { Plus, Search } from "lucide-react";
 import ProductTable from "./ProductTable";
 import ProductForm from "./ProductForm";
 import DeleteDialog from "./DeleteDialog";
-import { useProductManagementViewModel } from "../../../domain/useProductManagementViewModel";
+import { useProductManagementViewModel } from "../hooks/useProductManagementViewModel";
 
 const ProductManagement: React.FC = () => {
   const {

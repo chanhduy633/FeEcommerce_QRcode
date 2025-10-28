@@ -1,20 +1,19 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import type { Product } from "../types/Product";
-import { AdminProductViewModel } from "./adminProductViewModel";
+import type { IProduct } from "../../../types/Product";
+import { AdminProductViewModel } from "../../../app/viewmodels/adminProductViewModel";
 
 export const useProductManagementViewModel = () => {
   const vmRef = useRef(new AdminProductViewModel());
   const vm = vmRef.current;
 
   // ====== STATE ======
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<IProduct | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<IProduct | null>(null);
 
-  // ====== FETCH DATA ======
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -40,12 +39,12 @@ export const useProductManagementViewModel = () => {
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (product: Product) => {
+  const handleEdit = (product: IProduct) => {
     setEditingProduct(product);
     setIsDialogOpen(true);
   };
 
-  const handleSave = async (formData: Product) => {
+  const handleSave = async (formData: IProduct) => {
     if (editingProduct) await vm.updateProduct(editingProduct.id, formData);
     else await vm.addProduct(formData);
     setIsDialogOpen(false);

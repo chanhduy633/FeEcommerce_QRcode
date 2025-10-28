@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { useHomepageViewModel } from "../../domain/homepageViewModel";
+import { useHomepageViewModel } from "../../app/viewmodels/homepageViewModel";
 import Header from "./components/Header";
 import SidebarHome from "./components/SidebarHome";
 import FilterPanel from "./components/FilterPanel";
@@ -8,8 +8,10 @@ import Pagination from "../admin/components/Pagination";
 import ProductCard from "./components/ProductCard";
 import Footer from "./components/Footer";
 import { Package } from "lucide-react";
+import CartSidebar from "./components/CartSideBar";
 
 const Homepage = () => {
+  const userId = "68e32edd1285249e635ad98b"; // temp user id
   const {
     loading,
     error,
@@ -28,23 +30,25 @@ const Homepage = () => {
     setSortBy,
     showFilters,
     setShowFilters,
+    cart,
+    fetchCart,
+    handleAddToCart,
+    handleUpdateQuantity,
+    handleRemoveItem,
+    getProductById,
   } = useHomepageViewModel();
 
-  // Define a Product type if not already imported
-  type Product = {
-    id: string | number;
-    name: string;
-    price: number;
-    // add other fields as needed
-  };
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const handleBuyNow = (p: Product) =>
-    toast.success(`Mua ngay: ${p.name}`, {
-      description: `Giá: ${p.price.toLocaleString("vi-VN")}₫`,
+  useEffect(() => {
+    fetchCart(userId);
+  }, []);
+
+  const handleBuyNow = (product: any) => {
+    toast.success(`Mua ngay: ${product.name}`, {
+      description: `Giá: ${product.price.toLocaleString("vi-VN")}₫`,
     });
-
-  const handleAddToCart = (p: Product) =>
-    toast.success(`Đã thêm "${p.name}" vào giỏ hàng!`);
+  };
 
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>Lỗi: {error}</div>;
@@ -57,7 +61,8 @@ const Homepage = () => {
         categories={categories}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
-        cartItemCount={0}
+        cartItemCount={cart?.items?.length ?? 0}
+        onCartClick={() => setIsCartOpen(true)}
       />
 
       <div className="flex">
@@ -84,8 +89,10 @@ const Homepage = () => {
                 <ProductCard
                   key={p.id}
                   product={p}
-                  onBuyNow={handleBuyNow}
-                  onAddToCart={handleAddToCart}
+                  onBuyNow={() => handleBuyNow(p)}
+                  onAddToCart={() => {
+                    handleAddToCart(userId, p);
+                  }}
                 />
               ))}
             </div>
@@ -105,6 +112,15 @@ const Homepage = () => {
       </div>
 
       <Footer />
+
+      <CartSidebar
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cart?.items ?? []}
+        userId={userId}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+      />
     </div>
   );
 };

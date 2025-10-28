@@ -1,9 +1,9 @@
 import React from 'react';
-import type { Product } from '../../../types/Product';
+import type { IProduct } from '../../../types/Product';
 
 
 interface DeleteDialogProps {
-  product: Product | null;
+  product: IProduct | null;
   onConfirm: (id: string) => void;
   onCancel: () => void;
 }

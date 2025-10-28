@@ -1,11 +1,11 @@
 import React from "react";
 import { Package, Star } from "lucide-react";
-import type { Product } from "../../../types/Product";
+import type { IProduct } from "../../../types/Product";
 
 interface ProductCardProps {
-  product: Product;
-  onBuyNow: (product: Product) => void;
-  onAddToCart: (product: Product) => void;
+  product: IProduct;
+  onBuyNow: (product: IProduct) => void;
+  onAddToCart: (product: IProduct) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({

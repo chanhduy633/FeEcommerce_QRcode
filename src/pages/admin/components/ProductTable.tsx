@@ -1,11 +1,11 @@
 import React from "react";
 import { Edit, Trash2 } from "lucide-react";
-import type { Product } from "../../../types/Product";
+import type { IProduct } from "../../../types/Product";
 
 interface ProductTableProps {
-  products: Product[];
-  onEdit: (product: Product) => void;
-  onDelete: (product: Product) => void;
+  products: IProduct[];
+  onEdit: (product: IProduct) => void;
+  onDelete: (product: IProduct) => void;
 }
 
 const ProductTable: React.FC<ProductTableProps> = ({

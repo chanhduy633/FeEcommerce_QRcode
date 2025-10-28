@@ -1,7 +1,6 @@
 // src/pages/LoginAdmin.tsx
 import React from "react";
 import { dependencies } from "../app/authDependencies";
-import { useAuthViewModel } from "../domain/authViewModel";
 import {
   Card,
   CardContent,
@@ -12,8 +11,9 @@ import {
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Button } from "../components/ui/button";
+import { useAuthViewModel } from "../app/viewmodels/authViewModel";
 
-const LoginAdmin: React.FC = () => {
+const LoginAdmin = () => {
   const {
     email,
     password,
@@ -22,7 +22,8 @@ const LoginAdmin: React.FC = () => {
     setEmail,
     setPassword,
     handleSubmit,
-  } = useAuthViewModel(dependencies.authRemote);
+  } = useAuthViewModel(dependencies.authUseCase);
+
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center p-4 bg-background">

@@ -1,18 +1,21 @@
 import { AdminProductRemoteV1 } from "../data/remotes/adminProductRemoteV1";
-import type { AdminProductRemote } from "../data/remoteTypes";
+import { CreateProductUseCase } from "../domain/usecases/admin/createProduct";
+import { DeleteProductUseCase } from "../domain/usecases/admin/deleteProduct";
+import { UpdateProductUseCase } from "../domain/usecases/admin/updateProduct";
+import { GetAllProductsUseCase } from "../domain/usecases/getAllProducts";
 
-class AdminDependencies {
-  private static _instance: AdminDependencies;
-  productRemote: AdminProductRemote;
+const productRemote = new AdminProductRemoteV1();
 
-  private constructor() {
-    this.productRemote = new AdminProductRemoteV1();
-  }
+// Inject remote vào từng UseCase
+const getAllProductsUseCase = new GetAllProductsUseCase(productRemote);
+const createProductUseCase = new CreateProductUseCase(productRemote);
+const updateProductUseCase = new UpdateProductUseCase(productRemote);
+const deleteProductUseCase = new DeleteProductUseCase(productRemote);
 
-  static get instance() {
-    if (!this._instance) this._instance = new AdminDependencies();
-    return this._instance;
-  }
-}
-
-export const adminDependencies = AdminDependencies.instance;
+export const adminDependencies = {
+  productRemote,
+  getAllProductsUseCase,
+  createProductUseCase,
+  updateProductUseCase,
+  deleteProductUseCase,
+};
