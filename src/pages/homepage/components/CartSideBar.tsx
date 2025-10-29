@@ -5,7 +5,7 @@ import type { CartItem } from "../../../types/Cart";
 interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  cartItems: CartItem[];
+  cartItems: CartItem[]; 
   userId: string;
   onUpdateQuantity: (
     userId: string,
@@ -81,8 +81,6 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                   const id = item.product?._id ?? item.productId;
                   const name = item.product?.name ?? "Sản phẩm";
                   const image = item.product?.image ?? "/placeholder.png";
-                  console.log("Rendering cart item:", item);
-                  console.log("Rendering img:", image);
 
                   const price = item.product?.price ?? item.price ?? 0;
                   const quantity = item.quantity ?? 1;

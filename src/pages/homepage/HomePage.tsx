@@ -9,9 +9,15 @@ import ProductCard from "./components/ProductCard";
 import Footer from "./components/Footer";
 import { Package } from "lucide-react";
 import CartSidebar from "./components/CartSideBar";
+import { getGuestId } from "../../utils/guestId";
+
 
 const Homepage = () => {
-  const userId = "68e32edd1285249e635ad98b"; // temp user id
+  // const userId = "68e32edd1285249e635ad98b";
+  const userId = getGuestId();
+  console.log("Homepage userId:", userId);
+
+   // temp user id
   const {
     loading,
     error,
@@ -33,6 +39,7 @@ const Homepage = () => {
     cart,
     fetchCart,
     handleAddToCart,
+    handleBuyNow,
     handleUpdateQuantity,
     handleRemoveItem,
     getProductById,
@@ -43,12 +50,6 @@ const Homepage = () => {
   useEffect(() => {
     fetchCart(userId);
   }, []);
-
-  const handleBuyNow = (product: any) => {
-    toast.success(`Mua ngay: ${product.name}`, {
-      description: `Giá: ${product.price.toLocaleString("vi-VN")}₫`,
-    });
-  };
 
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>Lỗi: {error}</div>;
@@ -89,7 +90,10 @@ const Homepage = () => {
                 <ProductCard
                   key={p.id}
                   product={p}
-                  onBuyNow={() => handleBuyNow(p)}
+                  onBuyNow={async () => {
+                    await handleBuyNow(userId, p);
+                    setIsCartOpen(true); // mở sidebar
+                  }}
                   onAddToCart={() => {
                     handleAddToCart(userId, p);
                   }}

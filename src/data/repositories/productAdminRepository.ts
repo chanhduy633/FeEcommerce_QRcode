@@ -34,6 +34,11 @@ export class AdminProductRepository implements IAdminProductRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.remote.delete(id);
+  if (!id) {
+    console.error("Product id không hợp lệ:", id);
+    throw new Error("Không thể xóa sản phẩm: id không tồn tại");
   }
+  await this.remote.delete(id);
+}
+
 }

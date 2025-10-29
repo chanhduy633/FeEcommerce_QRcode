@@ -6,13 +6,13 @@ import { dependencies } from "../dependencies";
 
 export const useHomepageViewModel = () => {
   // 🧩 Lấy UseCases từ dependency injection
-  const { 
+  const {
     getAllProductsUseCase,
     getProductByIdUseCase,
     getCartUseCase,
     addToCartUseCase,
     updateCartItemUseCase,
-    removeCartItemUseCase
+    removeCartItemUseCase,
   } = dependencies;
 
   // ====== UI State ======
@@ -23,10 +23,13 @@ export const useHomepageViewModel = () => {
 
   const [selectedCategory, setSelectedCategory] = useState("Tất cả");
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50_000_000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    0, 50_000_000,
+  ]);
   const [sortBy, setSortBy] = useState("default");
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  
 
   // ====== PRODUCTS ======
   const getAllProducts = async () => {
@@ -73,14 +76,28 @@ export const useHomepageViewModel = () => {
     quantity = 1
   ) => {
     try {
-      const updated = await addToCartUseCase.execute(userId, product.id, quantity);
+      const updated = await addToCartUseCase.execute(
+        userId,
+        product.id,
+        quantity
+      );
       setCart(updated);
-      toast.success(`Đã thêm ${product.name} vào giỏ hàng!`, {
-});
+      toast.success(`Đã thêm ${product.name} vào giỏ hàng!`, {});
     } catch {
       toast.error("Không thể thêm sản phẩm!");
     }
   };
+
+  const handleBuyNow = async (userId: string, product: IProduct, quantity = 1) => {
+  try {
+    // Thêm sản phẩm vào giỏ hàng
+    await handleAddToCart(userId, product, quantity);
+   
+  } catch {
+    toast.error("Không thể mua ngay sản phẩm này!");
+  }
+};
+
 
   const handleUpdateQuantity = async (
     userId: string,
@@ -88,7 +105,11 @@ export const useHomepageViewModel = () => {
     quantity: number
   ) => {
     try {
-      const updated = await updateCartItemUseCase.execute(userId, productId, quantity);
+      const updated = await updateCartItemUseCase.execute(
+        userId,
+        productId,
+        quantity
+      );
       setCart(updated);
     } catch {
       toast.error("Không thể cập nhật số lượng!");
@@ -178,6 +199,7 @@ export const useHomepageViewModel = () => {
     cart,
     fetchCart,
     handleAddToCart,
+    handleBuyNow,
     handleUpdateQuantity,
     handleRemoveItem,
     getProductById,

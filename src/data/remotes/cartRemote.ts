@@ -12,14 +12,20 @@ export interface CartRemote {
 
 export class CartRemoteV1 implements CartRemote {
   private getToken() {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Token chưa tồn tại, vui lòng đăng nhập lại");
-    return token;
+    return localStorage.getItem("token") || null;
+  }
+
+  private getHeaders(isJson = true) {
+    const headers: Record<string, string> = {};
+    const token = this.getToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    if (isJson) headers["Content-Type"] = "application/json";
+    return headers;
   }
 
   async getCart(userId: string): Promise<Cart> {
     const res = await fetch(`${API_ROUTES.CART}/${userId}`, {
-      headers: { Authorization: `Bearer ${this.getToken()}` },
+      headers: this.getHeaders(false),
     });
     if (!res.ok) throw new Error("Không thể tải giỏ hàng");
     const data = await res.json();
@@ -29,10 +35,7 @@ export class CartRemoteV1 implements CartRemote {
   async addToCart(userId: string, productId: string, quantity: number): Promise<Cart> {
     const res = await fetch(`${API_ROUTES.CART}`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${this.getToken()}`,
-        "Content-Type": "application/json",
-      },
+      headers: this.getHeaders(),
       body: JSON.stringify({ userId, productId, quantity }),
     });
 
@@ -48,10 +51,7 @@ export class CartRemoteV1 implements CartRemote {
   async updateCartItem(userId: string, productId: string, quantity: number): Promise<Cart> {
     const res = await fetch(`${API_ROUTES.CART}`, {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${this.getToken()}`,
-        "Content-Type": "application/json",
-      },
+      headers: this.getHeaders(),
       body: JSON.stringify({ userId, productId, quantity }),
     });
 
@@ -67,10 +67,7 @@ export class CartRemoteV1 implements CartRemote {
   async removeCartItem(userId: string, productId: string): Promise<Cart> {
     const res = await fetch(`${API_ROUTES.CART}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${this.getToken()}`,
-        "Content-Type": "application/json",
-      },
+      headers: this.getHeaders(),
       body: JSON.stringify({ userId, productId }),
     });
 
@@ -86,7 +83,7 @@ export class CartRemoteV1 implements CartRemote {
   async clearCart(userId: string): Promise<void> {
     const res = await fetch(`${API_ROUTES.CART}/${userId}/clear`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${this.getToken()}` },
+      headers: this.getHeaders(false),
     });
     if (!res.ok) throw new Error("Không thể xóa toàn bộ giỏ hàng");
   }
