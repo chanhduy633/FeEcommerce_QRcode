@@ -4,6 +4,7 @@ import ProductTable from "./ProductTable";
 import ProductForm from "./ProductForm";
 import DeleteDialog from "./DeleteDialog";
 import { useProductManagementViewModel } from "../hooks/useProductManagementViewModel";
+import { uploadDependencies } from "../../../dependencies";
 
 const ProductManagement: React.FC = () => {
   const {
@@ -60,6 +61,7 @@ const ProductManagement: React.FC = () => {
               product={editingProduct}
               onSave={handleSave}
               onCancel={() => setIsDialogOpen(false)}
+              uploadImageUseCase={uploadDependencies.uploadImage} 
             />
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import type { IProduct } from "../../../types/Product";
-import { AdminProductViewModel } from "../../../app/viewmodels/adminProductViewModel";
+import type { IProduct } from "../../../../types/Product";
+import { AdminProductViewModel } from "../../../viewmodels/adminProductViewModel";
 
 export const useProductManagementViewModel = () => {
   const vmRef = useRef(new AdminProductViewModel());

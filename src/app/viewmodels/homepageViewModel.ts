@@ -24,7 +24,7 @@ export const useHomepageViewModel = () => {
   const [selectedCategory, setSelectedCategory] = useState("Tất cả");
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState<[number, number]>([
-    0, 50_000_000,
+    0, 100_000_000,
   ]);
   const [sortBy, setSortBy] = useState("default");
   const [showFilters, setShowFilters] = useState(false);

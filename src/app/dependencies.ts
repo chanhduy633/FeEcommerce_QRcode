@@ -11,7 +11,32 @@ import { GetCart } from "../domain/usecases/cart/getCart";
 import { AddToCart } from "../domain/usecases/cart/addToCart";
 import { UpdateCartItem } from "../domain/usecases/cart/updateCartItem";
 import { RemoveCartItem } from "../domain/usecases/cart/removeCartItem";
-import { GetProductByIdUseCase } from "../domain/usecases/home/GetProductById";
+import { GetProductByIdUseCase } from "../domain/usecases/home/getProductById";
+import { UploadRemote } from "../data/remotes/uploadRemote";
+import { UploadRepository } from "../data/repositories/uploadRepository";
+import { UploadImageUseCase } from "../domain/usecases/admin/uploadImageUseCase";
+import { RemoteUserRepository } from "../data/repositories/UserRepository";
+import { LoginWithOAuthUseCase } from "../domain/usecases/home/loginWithOAuthUseCase";
+import { AuthUserRemote } from "../data/remotes/authUserRemote";
+import { AuthUserRepository } from "../data/repositories/authUserRepository";
+import { AuthUserUseCase } from "../domain/usecases/home/authUserUseCase";
+
+const uploadRemote = new UploadRemote();
+const uploadRepo = new UploadRepository(uploadRemote);
+
+export const uploadDependencies = {
+  uploadImage: new UploadImageUseCase(uploadRepo),
+};
+
+
+
+const authUserRemote = new AuthUserRemote();
+const authUserRepository = new AuthUserRepository(authUserRemote);
+export const authUserUseCase = new AuthUserUseCase(authUserRepository);
+
+
+export const userRepo = new RemoteUserRepository();
+export const loginUseCase = new LoginWithOAuthUseCase(userRepo);
 
 // ============================================================
 // 🧩 Remote

@@ -1,6 +1,6 @@
 import React from "react";
 import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
-import type { CartItem } from "../../../types/Cart";
+import type { CartItem } from "../../../../types/Cart";
 
 interface CartSidebarProps {
   isOpen: boolean;

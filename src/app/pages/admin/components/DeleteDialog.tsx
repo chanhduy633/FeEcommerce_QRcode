@@ -1,5 +1,5 @@
 import React from 'react';
-import type { IProduct } from '../../../types/Product';
+import type { IProduct } from '../../../../types/Product';
 
 
 interface DeleteDialogProps {

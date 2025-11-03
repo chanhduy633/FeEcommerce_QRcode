@@ -1,9 +1,10 @@
 import { Toaster } from "sonner";
 import { BrowserRouter, Route, Routes } from "react-router";
-import NotFound from "./pages/NotFound";
-import LoginAdmin from "./pages/LoginAdmin";
-import DashboardAdmin from "./pages/admin/DashboardAdmin";
-import Homepage from "./pages/homepage/HomePage";
+import NotFound from "./app/pages/NotFound";
+import LoginAdmin from "./app/pages/admin/LoginAdmin";
+import DashboardAdmin from "./app/pages/admin/DashboardAdmin";
+import Homepage from "./app/pages/homepage/HomePage";
+import OAuthSuccess from "./app/pages/homepage/OAuthSuccess";
 function App() {
   return (
     <div className="min-h-screen w-full bg-background">
@@ -14,6 +15,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Homepage />} />
+          <Route path="/auth/success" element={<OAuthSuccess />} />
           <Route path="/login" element={<LoginAdmin />} />
           <Route path="/admin/dashboard" element={<DashboardAdmin />} />
           <Route path="*" element={<NotFound />} />

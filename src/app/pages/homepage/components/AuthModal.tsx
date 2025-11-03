@@ -1,6 +1,19 @@
 // components/AuthModal.tsx
 import React, { useState } from "react";
-import { X, Mail, Lock, User, Phone, Eye, EyeOff, CheckCircle2, ShoppingBag, Shield, Zap } from "lucide-react";
+import {
+  X,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  ShoppingBag,
+  Shield,
+  Zap,
+} from "lucide-react";
+import { authUserUseCase } from "../../../dependencies";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -18,7 +31,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [mode, setMode] = useState<AuthMode>("login");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     email: "",
@@ -70,38 +83,31 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
-    setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock success
-      const mockData = {
-        userId: "mock-user-id",
-        token: "mock-token",
-        user: {
+      let userData;
+      if (mode === "login") {
+        userData = await authUserUseCase.login(formData.email, formData.password);
+      } else {
+        userData = await authUserUseCase.register({
           email: formData.email,
-          full_name: formData.full_name || "User",
+          password: formData.password,
+          full_name: formData.full_name,
           phone: formData.phone,
-        }
-      };
-      
-      onLoginSuccess(mockData.userId, mockData.user);
-      setFormData({ email: "", password: "", full_name: "", phone: "" });
+        });
+      }
+
+      onLoginSuccess(userData.user._id, userData.user);
       onClose();
-    } catch (error: any) {
-      setErrors({ submit: error.message || "Có lỗi xảy ra" });
-    } finally {
-      setLoading(false);
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
   const handleGoogleLogin = () => {
-    // Redirect to Google OAuth
-    console.log("Google login");
+    const googleLoginUrl = authUserUseCase.getGoogleOAuthUrl();
+    window.open(googleLoginUrl, "_self");
   };
 
   const switchMode = () => {
@@ -133,13 +139,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
             <div className="relative z-10">
               {/* Logo & Title */}
               <div className="mb-8">
-               
                 <h2 className="text-4xl font-bold mb-3">
                   {mode === "login" ? "TechStore xin chào!" : "Tạo tài khoản"}
                 </h2>
                 <p className="text-gray-400 text-lg">
-                  {mode === "login" 
-                    ? "Đăng nhập để tiếp tục mua sắm" 
+                  {mode === "login"
+                    ? "Đăng nhập để tiếp tục mua sắm"
                     : "Bắt đầu hành trình mua sắm của bạn"}
                 </p>
               </div>
@@ -152,7 +157,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Mua sắm dễ dàng</h3>
-                    <p className="text-gray-400 text-sm">Hàng ngàn sản phẩm công nghệ chính hãng</p>
+                    <p className="text-gray-400 text-sm">
+                      Hàng ngàn sản phẩm công nghệ chính hãng
+                    </p>
                   </div>
                 </div>
 
@@ -162,7 +169,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Thanh toán an toàn</h3>
-                    <p className="text-gray-400 text-sm">Bảo mật thông tin 100%</p>
+                    <p className="text-gray-400 text-sm">
+                      Bảo mật thông tin 100%
+                    </p>
                   </div>
                 </div>
 
@@ -172,7 +181,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Giao hàng nhanh</h3>
-                    <p className="text-gray-400 text-sm">Miễn phí ship cho đơn trên 500k</p>
+                    <p className="text-gray-400 text-sm">
+                      Miễn phí ship cho đơn trên 500k
+                    </p>
                   </div>
                 </div>
               </div>
@@ -203,21 +214,33 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 {mode === "login" ? "Đăng nhập" : "Đăng ký"}
               </h3>
               <p className="text-gray-500 mb-6">
-                {mode === "login" 
-                  ? "Chào mừng bạn quay đến với TechStore!" 
+                {mode === "login"
+                  ? "Chào mừng bạn quay đến với TechStore!"
                   : "Tạo tài khoản mới để bắt đầu"}
               </p>
 
               {/* Google Login Button */}
               <button
                 onClick={handleGoogleLogin}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-md transition-all group mb-6"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-white border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-md transition-all group mb-6 cursor-pointer"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  />
                 </svg>
                 <span className="font-medium text-gray-700 group-hover:text-gray-900">
                   {mode === "login" ? "Đăng nhập" : "Đăng ký"} với Google
@@ -240,15 +263,18 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       Họ và tên
                     </label>
                     <div className="relative">
-                      <User className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                      <User
+                        className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
                       <input
                         type="text"
                         name="full_name"
                         value={formData.full_name}
                         onChange={handleChange}
                         className={`w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all ${
-                          errors.full_name 
-                            ? "border-red-300 focus:border-red-500" 
+                          errors.full_name
+                            ? "border-red-300 focus:border-red-500"
                             : "border-gray-200 focus:border-blue-500"
                         }`}
                         placeholder="Nguyễn Văn A"
@@ -270,15 +296,18 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       Số điện thoại
                     </label>
                     <div className="relative">
-                      <Phone className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                      <Phone
+                        className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
                       <input
                         type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
                         className={`w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all ${
-                          errors.phone 
-                            ? "border-red-300 focus:border-red-500" 
+                          errors.phone
+                            ? "border-red-300 focus:border-red-500"
                             : "border-gray-200 focus:border-blue-500"
                         }`}
                         placeholder="0912345678"
@@ -299,15 +328,18 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     Email
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <Mail
+                      className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={20}
+                    />
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       className={`w-full pl-11 pr-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all ${
-                        errors.email 
-                          ? "border-red-300 focus:border-red-500" 
+                        errors.email
+                          ? "border-red-300 focus:border-red-500"
                           : "border-gray-200 focus:border-blue-500"
                       }`}
                       placeholder="example@gmail.com"
@@ -327,15 +359,18 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     Mật khẩu
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <Lock
+                      className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={20}
+                    />
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
                       className={`w-full pl-11 pr-12 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all ${
-                        errors.password 
-                          ? "border-red-300 focus:border-red-500" 
+                        errors.password
+                          ? "border-red-300 focus:border-red-500"
                           : "border-gray-200 focus:border-blue-500"
                       }`}
                       placeholder="••••••••"
@@ -343,7 +378,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -361,7 +396,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
                     >
                       Quên mật khẩu?
                     </button>
@@ -380,7 +415,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3.5 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3.5 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   {loading ? (
                     <>
@@ -389,8 +424,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     </>
                   ) : (
                     <>
-                      <span>{mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}</span>
-                      <CheckCircle2 className="group-hover:translate-x-1 transition-transform" size={20} />
+                      <span>
+                        {mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
+                      </span>
+                      <CheckCircle2
+                        className="group-hover:translate-x-1 transition-transform"
+                        size={20}
+                      />
                     </>
                   )}
                 </button>
@@ -402,7 +442,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   {mode === "login" ? "Chưa có tài khoản?" : "Đã có tài khoản?"}{" "}
                   <button
                     onClick={switchMode}
-                    className="text-blue-600 font-semibold hover:text-blue-700 hover:underline"
+                    className="text-blue-600 font-semibold hover:text-blue-700 hover:underline cursor-pointer"
                   >
                     {mode === "login" ? "Đăng ký ngay" : "Đăng nhập"}
                   </button>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { useHomepageViewModel } from "../../app/viewmodels/homepageViewModel";
+import { useHomepageViewModel } from "../../viewmodels/homepageViewModel";
 import Header from "./components/Header";
 import SidebarHome from "./components/SidebarHome";
 import FilterPanel from "./components/FilterPanel";
@@ -9,15 +9,12 @@ import ProductCard from "./components/ProductCard";
 import Footer from "./components/Footer";
 import { Package } from "lucide-react";
 import CartSidebar from "./components/CartSideBar";
-import { getGuestId } from "../../utils/guestId";
-
+import { getGuestId } from "../../../utils/guestId";
 
 const Homepage = () => {
-  // const userId = "68e32edd1285249e635ad98b";
-  const userId = getGuestId();
-  console.log("Homepage userId:", userId);
+  const [user, setUser] = useState<any>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
-   // temp user id
   const {
     loading,
     error,
@@ -42,14 +39,36 @@ const Homepage = () => {
     handleBuyNow,
     handleUpdateQuantity,
     handleRemoveItem,
-    getProductById,
   } = useHomepageViewModel();
 
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
+  // 🧩 Khôi phục user khi reload
   useEffect(() => {
-    fetchCart(userId);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      fetchCart(parsedUser._id); // Load giỏ hàng thật
+    } else {
+      fetchCart(getGuestId()); // Nếu không có user → giỏ hàng khách
+    }
   }, []);
+
+  const userId = user?._id || getGuestId();
+  console.log("Homepage - current userId:", userId);
+
+  const handleLoginSuccess = (userId: string, userData: any) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+    toast.success("Đăng nhập thành công!");
+    fetchCart(userData._id);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    toast.info("Đã đăng xuất.");
+    fetchCart(getGuestId());
+  };
 
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>Lỗi: {error}</div>;
@@ -64,6 +83,10 @@ const Homepage = () => {
         onCategoryChange={setSelectedCategory}
         cartItemCount={cart?.items?.length ?? 0}
         onCartClick={() => setIsCartOpen(true)}
+        isLoggedIn={!!user}
+        userInfo={user}
+        onLoginSuccess={handleLoginSuccess}
+        onLogout={handleLogout}
       />
 
       <div className="flex">
@@ -92,11 +115,9 @@ const Homepage = () => {
                   product={p}
                   onBuyNow={async () => {
                     await handleBuyNow(userId, p);
-                    setIsCartOpen(true); // mở sidebar
+                    setIsCartOpen(true);
                   }}
-                  onAddToCart={() => {
-                    handleAddToCart(userId, p);
-                  }}
+                  onAddToCart={() => handleAddToCart(userId, p)}
                 />
               ))}
             </div>

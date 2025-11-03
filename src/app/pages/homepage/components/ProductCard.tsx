@@ -1,6 +1,6 @@
 import React from "react";
 import { Package, Star } from "lucide-react";
-import type { IProduct } from "../../../types/Product";
+import type { IProduct } from "../../../../types/Product";
 
 interface ProductCardProps {
   product: IProduct;

@@ -83,7 +83,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
               />
             </div>
             <button
-              onClick={() => onPriceRangeChange([0, 50000000])}
+              onClick={() => onPriceRangeChange([0, 100000000])}
               className="text-blue-600 hover:text-blue-700 text-sm cursor-pointer"
             >
               Đặt lại

@@ -18,7 +18,7 @@ export interface LoginResponse {
 
 export class AuthRemote {
   async login(email: string, password: string): Promise<LoginResponse> {
-    const response = await fetch(API_ROUTES.LOGIN, {
+    const response = await fetch(API_ROUTES.LOGIN_ADMIN, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

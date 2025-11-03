@@ -96,7 +96,7 @@ const Header: React.FC<HeaderProps> = ({
                 <div className="relative">
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center space-x-2 hover:bg-gray-100 rounded-lg px-3 py-2 transition-colors"
+                    className="flex items-center space-x-2 hover:bg-gray-100 rounded-lg px-3 py-1 cursor-pointer transition-colors"
                   >
                     <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
                       {getInitials(userInfo.full_name)}
@@ -105,9 +105,9 @@ const Header: React.FC<HeaderProps> = ({
                       <p className="text-sm font-medium text-gray-700">
                         {userInfo.full_name || "User"}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      {/* <p className="text-xs text-gray-500">
                         {userInfo.email || ""}
-                      </p>
+                      </p> */}
                     </div>
                     <ChevronDown
                       size={16}
@@ -125,14 +125,14 @@ const Header: React.FC<HeaderProps> = ({
                           setIsDropdownOpen(false);
                           // Navigate to profile
                         }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2 cursor-pointer"
                       >
                         <User size={16} />
                         <span>Tài khoản của tôi</span>
                       </button>
                       <button
                         onClick={handleLogout}
-                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 cursor-pointer"
                       >
                         <LogOut size={16} />
                         <span>Đăng xuất</span>
@@ -143,7 +143,7 @@ const Header: React.FC<HeaderProps> = ({
               ) : (
                 <button
                   onClick={() => setIsAuthModalOpen(true)}
-                  className="flex items-center space-x-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
                 >
                   <User size={20} />
                   <span className="hidden sm:inline">Đăng nhập</span>

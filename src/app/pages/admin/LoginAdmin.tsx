@@ -1,17 +1,17 @@
 // src/pages/LoginAdmin.tsx
 import React from "react";
-import { dependencies } from "../app/authDependencies";
+import { dependencies } from "../../authDependencies";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Button } from "../components/ui/button";
-import { useAuthViewModel } from "../app/viewmodels/authViewModel";
+} from "../../../components/ui/card";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import { Button } from "../../../components/ui/button";
+import { useAuthViewModel } from "../../viewmodels/authViewModel";
 
 const LoginAdmin = () => {
   const {
