@@ -1,11 +1,13 @@
 import React from "react";
 import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
 import type { CartItem } from "../../../../types/Cart";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom"; // 🟢 thêm dòng này
 
 interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  cartItems: CartItem[]; 
+  cartItems: CartItem[];
   userId: string;
   onUpdateQuantity: (
     userId: string,
@@ -23,6 +25,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
   onUpdateQuantity,
   onRemoveItem,
 }) => {
+  const navigate = useNavigate(); // 🟢 khởi tạo điều hướng
+
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -33,6 +37,17 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
     const price = item.product?.price ?? item.price ?? 0;
     return sum + price * (item.quantity ?? 0);
   }, 0);
+
+  // 🟢 Hàm xử lý chuyển đến trang thanh toán
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      toast.error("Giỏ hàng trống!");
+      return;
+    }
+    onClose(); // đóng sidebar trước
+    localStorage.setItem("checkoutData", JSON.stringify({ cartItems, totalAmount }));
+    navigate("/checkout", { state: { cartItems, totalAmount } }); // truyền dữ liệu sang trang thanh toán
+  };
 
   return (
     <>
@@ -84,7 +99,22 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
 
                   const price = item.product?.price ?? item.price ?? 0;
                   const quantity = item.quantity ?? 1;
+                  const totalPrice = price * quantity;
+                  const stock = item.product?.stock ?? Infinity;
 
+                  const handleIncrease = () => {
+                    if (quantity < stock) {
+                      onUpdateQuantity(userId, id, quantity + 1);
+                    } else {
+                      toast.error(`Chỉ còn ${stock} sản phẩm trong kho`);
+                    }
+                  };
+
+                  const handleDecrease = () => {
+                    if (quantity > 1) {
+                      onUpdateQuantity(userId, id, quantity - 1);
+                    }
+                  };
                   return (
                     <div
                       key={id}
@@ -102,17 +132,14 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                         <p className="text-blue-600 font-bold text-sm mb-2">
                           {formatPrice(price)}
                         </p>
+                        <p className="text-gray-500 text-sm mb-2">
+                          Tổng: {formatPrice(totalPrice)}
+                        </p>
                         <div className="flex items-center justify-between">
                           {/* Quantity control */}
                           <div className="flex items-center space-x-2 bg-white rounded-lg border">
                             <button
-                              onClick={() =>
-                                onUpdateQuantity(
-                                  userId,
-                                  id,
-                                  Math.max(quantity - 1, 1)
-                                )
-                              }
+                              onClick={handleDecrease}
                               className="p-1 hover:bg-gray-100 rounded-l-lg cursor-pointer"
                             >
                               <Minus size={16} className="text-gray-600" />
@@ -121,9 +148,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                               {quantity}
                             </span>
                             <button
-                              onClick={() =>
-                                onUpdateQuantity(userId, id, quantity + 1)
-                              }
+                              onClick={handleIncrease}
                               className="p-1 hover:bg-gray-100 rounded-r-lg cursor-pointer"
                             >
                               <Plus size={16} className="text-gray-600" />
@@ -157,7 +182,11 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                   {formatPrice(totalAmount)}
                 </span>
               </div>
-              <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer">
+              {/* 🟢 Nút thanh toán */}
+              <button
+                onClick={handleCheckout}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer"
+              >
                 Thanh toán
               </button>
             </div>

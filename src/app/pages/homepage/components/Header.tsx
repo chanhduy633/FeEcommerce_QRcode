@@ -1,6 +1,14 @@
 import React, { useState } from "react";
-import { Search, ShoppingCart, User, LogOut, ChevronDown } from "lucide-react";
+import {
+  Search,
+  ShoppingCart,
+  User,
+  LogOut,
+  ChevronDown,
+  Package,
+} from "lucide-react";
 import AuthModal from "./AuthModal";
+import OrderTrackingModal from "./OrderTrackingModal";
 
 interface HeaderProps {
   searchTerm: string;
@@ -26,6 +34,7 @@ const Header: React.FC<HeaderProps> = ({
   onLoginSuccess,
   onLogout,
 }) => {
+  const [isOrderTrackingOpen, setIsOrderTrackingOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -78,8 +87,16 @@ const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
-            {/* Right: Cart + Avatar */}
+            {/* Right: Search Cart + Cart + Avatar */}
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setIsOrderTrackingOpen(true)}
+                className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <Package size={20} />
+                <span className="hidden sm:inline">Tra cứu đơn</span>
+              </button>
+
               <button
                 onClick={onCartClick}
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
@@ -158,6 +175,10 @@ const Header: React.FC<HeaderProps> = ({
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+      />
+      <OrderTrackingModal
+        isOpen={isOrderTrackingOpen}
+        onClose={() => setIsOrderTrackingOpen(false)}
       />
     </>
   );

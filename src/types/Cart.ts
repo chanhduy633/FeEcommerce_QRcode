@@ -1,4 +1,4 @@
-// ========== Item trong giỏ hàng ==========
+ // ========== Item trong giỏ hàng ==========
 export interface CartItem {
   price: number;
   productId: string; // ID của sản phẩm (ObjectId dạng string)
@@ -11,6 +11,7 @@ export interface CartItem {
     name: string;
     price: number;
     image?: string;
+    stock: number;
   };
 }
 

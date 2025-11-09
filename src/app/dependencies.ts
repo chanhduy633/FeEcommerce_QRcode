@@ -15,8 +15,8 @@ import { GetProductByIdUseCase } from "../domain/usecases/home/getProductById";
 import { UploadRemote } from "../data/remotes/uploadRemote";
 import { UploadRepository } from "../data/repositories/uploadRepository";
 import { UploadImageUseCase } from "../domain/usecases/admin/uploadImageUseCase";
-import { RemoteUserRepository } from "../data/repositories/UserRepository";
 import { LoginWithOAuthUseCase } from "../domain/usecases/home/loginWithOAuthUseCase";
+import { RemoteUserRepository } from "../data/repositories/UserRepository";
 import { AuthUserRemote } from "../data/remotes/authUserRemote";
 import { AuthUserRepository } from "../data/repositories/authUserRepository";
 import { AuthUserUseCase } from "../domain/usecases/home/authUserUseCase";
@@ -74,4 +74,18 @@ export const dependencies = {
   addToCartUseCase,
   updateCartItemUseCase,
   removeCartItemUseCase,
+};
+import { OrderRemote } from "../data/remotes/orderRemote";
+import { OrderRepository } from "../data/repositories/orderRepository";
+import { GetOrdersUseCase } from "../domain/usecases/order/getOrdersUseCase";
+import { UpdateOrderStatusUseCase } from "../domain/usecases/order/updateOrderStatusUseCase";
+import { GetOrderDetailUseCase } from "../domain/usecases/order/getOrderDetailUseCase";
+
+const orderRemote = new OrderRemote();
+const orderRepository = new OrderRepository(orderRemote);
+
+export const orderDependencies = {
+  getOrders: new GetOrdersUseCase(orderRepository),
+  updateStatus: new UpdateOrderStatusUseCase(orderRepository),
+  getDetail: new GetOrderDetailUseCase(orderRepository),
 };

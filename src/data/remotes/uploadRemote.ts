@@ -16,8 +16,6 @@ export class UploadRemote implements IUploadRepository {
 
     const data = await res.json();
 
-    // server trả về URL: http://localhost:5317/uploads/products/...
-    console.log("Uploaded image URL:", data.url);
     return data.url;
   }
 }

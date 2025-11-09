@@ -29,7 +29,6 @@ export const useHomepageViewModel = () => {
   const [sortBy, setSortBy] = useState("default");
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  
 
   // ====== PRODUCTS ======
   const getAllProducts = async () => {
@@ -73,31 +72,50 @@ export const useHomepageViewModel = () => {
   const handleAddToCart = async (
     userId: string,
     product: IProduct,
-    quantity = 1
+    quantityToAdd = 1
   ) => {
     try {
+      // Lấy số lượng sản phẩm hiện có trong giỏ
+      const cartItems = cart?.items ?? []; // nếu cart null thì coi như rỗng
+      const existingItem = cartItems.find(
+        (item) =>
+          item.product?._id === product.id || item.productId === product.id
+      );
+      const currentQuantity = existingItem?.quantity ?? 0;
+
+      const maxStock = product.stock ?? Infinity;
+
+      const remaining = Math.max(maxStock - currentQuantity, 0);
+
+      if (quantityToAdd > remaining) {
+        toast.error(`Chỉ còn ${remaining} sản phẩm trong kho`);
+        return;
+      }
+      // Nếu hợp lệ, thêm vào giỏ
       const updated = await addToCartUseCase.execute(
         userId,
         product.id,
-        quantity
+        quantityToAdd
       );
       setCart(updated);
-      toast.success(`Đã thêm ${product.name} vào giỏ hàng!`, {});
+      toast.success(`Đã thêm ${product.name} vào giỏ hàng!`);
     } catch {
       toast.error("Không thể thêm sản phẩm!");
     }
   };
 
-  const handleBuyNow = async (userId: string, product: IProduct, quantity = 1) => {
-  try {
-    // Thêm sản phẩm vào giỏ hàng
-    await handleAddToCart(userId, product, quantity);
-   
-  } catch {
-    toast.error("Không thể mua ngay sản phẩm này!");
-  }
-};
-
+  const handleBuyNow = async (
+    userId: string,
+    product: IProduct,
+    quantity = 1
+  ) => {
+    try {
+      // Thêm sản phẩm vào giỏ hàng
+      await handleAddToCart(userId, product, quantity);
+    } catch {
+      toast.error("Không thể mua ngay sản phẩm này!");
+    }
+  };
 
   const handleUpdateQuantity = async (
     userId: string,

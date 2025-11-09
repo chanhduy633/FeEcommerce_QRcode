@@ -4,6 +4,7 @@ import Dashboard from "./components/Dashboard";
 import ProductManagement from "./components/ProductManagement";
 import Sidebar from "./components/Sidebar";
 import { useNavigate } from "react-router-dom";
+import OrderManagement from "./components/OrderManagement";
 
 const DashboardAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -72,6 +73,7 @@ const DashboardAdmin: React.FC = () => {
         <main className="flex-1 overflow-y-auto p-6">
           {activeTab === "dashboard" && <Dashboard />}
           {activeTab === "products" && <ProductManagement />}
+          {activeTab === "orders" && <OrderManagement />}
         </main>
       </div>
     </div>

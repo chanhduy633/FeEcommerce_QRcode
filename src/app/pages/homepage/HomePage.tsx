@@ -54,7 +54,6 @@ const Homepage = () => {
   }, []);
 
   const userId = user?._id || getGuestId();
-  console.log("Homepage - current userId:", userId);
 
   const handleLoginSuccess = (userId: string, userData: any) => {
     setUser(userData);
