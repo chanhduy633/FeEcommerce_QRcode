@@ -18,39 +18,48 @@ import CartSidebar from "./components/CartSideBar";
 import TrustBadges from "./components/TrustBadges";
 import { getGuestId } from "../../../utils/guestId";
 import type { IProduct } from "../../../types/Product";
-import { useHomepageViewModel } from "../../viewmodels/homepageViewModel";
+import { useProductDetailViewModel } from "../../viewmodels/productDetailViewModel";
+import { useParams } from "react-router-dom";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
-  const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [product, setProduct] = useState<IProduct | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [favorite, setFavorite] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { id: productId } = useParams<{ id: string }>();
 
-  const id = window.location.pathname.split("/").pop() || "1";
-
+  // ====== USE VIEW MODEL ======
   const {
+    product,
+    loading,
+    error,
+    images,
+    quantity,
+    selectedImage,
+    setSelectedImage,
+    favorite,
+    actionLoading,
+    loadingText,
+    currentIndex,
+    setCurrentIndex,
     cart,
+    cartItemCount,
     allProducts,
-    fetchCart,
-    handleAddToCart,
-    handleUpdateQuantity,
-    handleRemoveItem,
     categories,
     selectedCategory,
     setSelectedCategory,
     searchTerm,
     setSearchTerm,
-  } = useHomepageViewModel();
+    relatedProducts,
+    handleQuantityChange,
+    handleAddToCartClick,
+    handleBuyNowClick,
+    toggleFavorite,
+    handleUpdateQuantity,
+    handleRemoveItem,
+    fetchCart,
+  } = useProductDetailViewModel(productId);
 
-  // Lấy user từ localStorage
+  // ====== USER MANAGEMENT ======
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -61,155 +70,12 @@ const ProductDetail = () => {
       fetchCart(getGuestId());
     }
   }, []);
-
+  // Extract product ID from URL
+  if (!productId) {
+    navigate("/");
+    return null;
+  }
   const userId = user?._id || getGuestId();
-
-  // Fetch product
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`http://localhost:5317/api/v1/products/${id}`);
-        if (!res.ok) throw new Error("Không thể tải sản phẩm");
-        const result = await res.json();
-        
-        // ✅ Normalize product data: map _id → id để đồng nhất với Homepage
-        const productData = {
-          ...result.data,
-          id: result.data._id || result.data.id, // Ưu tiên _id nếu có
-        };
-        
-        console.log("📦 Fetched and normalized product:", productData);
-        setProduct(productData);
-        setError(null);
-      } catch (err: any) {
-        setError(err.message || "Lỗi không xác định");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProduct();
-  }, [id]);
-
-  const formatPrice = (price: number) =>
-    price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
-
-  const handleQuantityChange = (type: "increase" | "decrease") => {
-    if (type === "increase" && product && quantity < product.stock) {
-      setQuantity(quantity + 1);
-    }
-    if (type === "decrease" && quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
-
-  const showLoading = (text: string) => {
-    setActionLoading(true);
-    setLoadingText(text);
-  };
-
-  const hideLoading = () => {
-    setTimeout(() => {
-      setActionLoading(false);
-      setLoadingText("");
-    }, 800);
-  };
-
-  // ✅ Helper: Validate stock trước khi thêm
-  const validateStock = (quantityToAdd: number): boolean => {
-    if (!product) return false;
-
-    const cartItems = cart?.items ?? [];
-    
-    // Tìm sản phẩm trong giỏ bằng productId (quan trọng!)
-    const existingItem = cartItems.find(
-      (item) => item.productId === product.id
-    );
-    
-    const currentQuantity = existingItem?.quantity ?? 0;
-    const newTotal = currentQuantity + quantityToAdd;
-
-    if (newTotal > product.stock) {
-      const remaining = Math.max(product.stock - currentQuantity, 0);
-      if (remaining === 0) {
-        toast.error("Sản phẩm đã đạt giới hạn trong giỏ hàng!");
-      } else {
-        toast.error(`Chỉ có thể thêm tối đa ${remaining} sản phẩm nữa!`);
-      }
-      return false;
-    }
-
-    return true;
-  };
-
-  // ✅ Thêm vào giỏ hàng với validation
-  const handleAddToCartClick = async () => {
-    if (!product) return;
-
-    // Validate stock trước
-    if (!validateStock(quantity)) {
-      return;
-    }
-
-    showLoading("Đang thêm vào giỏ hàng...");
-
-    try {
-     
-      // Gọi handleAddToCart từ viewModel (đã xử lý logic thêm)
-      await handleAddToCart(userId, product, quantity);
-      
-      // Đồng bộ lại giỏ hàng
-      await fetchCart(userId);
-      
-      // Reset quantity về 1
-      setQuantity(1);
-      
-      toast.success(`Đã thêm ${product.name} vào giỏ hàng!`);
-    } catch (error) {
-      console.error("❌ Error adding to cart:", error);
-      toast.error("Không thể thêm sản phẩm vào giỏ hàng!");
-    } finally {
-      hideLoading();
-    }
-  };
-
-  // ✅ Mua ngay = Thêm vào giỏ + Mở sidebar
-  const handleBuyNowClick = async () => {
-    if (!product) return;
-
-    // Validate stock trước
-    if (!validateStock(quantity)) {
-      return;
-    }
-
-    showLoading("Đang xử lý mua hàng...");
-
-    try {
-      // Thêm vào giỏ
-      await handleAddToCart(userId, product, quantity);
-      
-      // Đồng bộ giỏ hàng
-      await fetchCart(userId);
-      
-      // Reset quantity
-      setQuantity(1);
-      
-      // Mở cart sidebar
-      setIsCartOpen(true);
-      
-      toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
-    } catch (error) {
-      console.error("Error buying now:", error);
-      toast.error("Không thể mua sản phẩm này!");
-    } finally {
-      hideLoading();
-    }
-  };
-
-  const toggleFavorite = () => {
-    setFavorite(!favorite);
-    toast.success(favorite ? "Đã xóa khỏi yêu thích" : "Đã thêm vào yêu thích");
-  };
 
   const handleLoginSuccess = (userId: string, userData: any) => {
     setUser(userData);
@@ -225,55 +91,17 @@ const ProductDetail = () => {
     fetchCart(getGuestId());
   };
 
+  // ====== NAVIGATION ======
   const handleProductSelect = (product: IProduct) => {
     navigate(`/product/${product.id}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const getRelatedProducts = (
-    product: IProduct,
-    allProducts: IProduct[],
-    maxResults = 8
-  ) => {
-    if (!product) return [];
+  // ====== UTILS ======
+  const formatPrice = (price: number) =>
+    price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 
-    const keywords = [
-      ...product.name
-        .toLowerCase()
-        .split(" ")
-        .filter((w) => w.length > 2),
-      ...(product.description
-        ? product.description
-            .toLowerCase()
-            .split(" ")
-            .filter((w) => w.length > 2)
-        : []),
-    ];
-
-    const scoredProducts = allProducts
-      .filter((p) => p.id !== product.id)
-      .map((p) => {
-        const nameWords = p.name.toLowerCase().split(" ");
-        const descriptionWords = p.description?.toLowerCase().split(" ") || [];
-
-        const matchCount = keywords.filter(
-          (kw) => nameWords.includes(kw) || descriptionWords.includes(kw)
-        ).length;
-
-        return { ...p, matchCount };
-      })
-      .filter((p) => p.matchCount > 0)
-      .sort((a, b) => b.matchCount - a.matchCount);
-
-    return scoredProducts.slice(0, maxResults);
-  };
-
-  const relatedProducts = product
-    ? getRelatedProducts(product, allProducts, 8)
-    : [];
-  const images = product?.image_url ? [product.image_url] : [];
-
-  // Loading state
+  // ====== LOADING STATE ======
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -285,7 +113,7 @@ const ProductDetail = () => {
     );
   }
 
-  // Error state
+  // ====== ERROR STATE ======
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -306,7 +134,7 @@ const ProductDetail = () => {
     );
   }
 
-  // No product
+  // ====== NO PRODUCT ======
   if (!product) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -324,13 +152,7 @@ const ProductDetail = () => {
     );
   }
 
-  // ✅ Tính cart item count (chỉ sản phẩm còn hàng)
-  const cartItemCount =
-    cart?.items?.filter((item) => {
-      const product = allProducts.find((p) => p.id === item.productId);
-      return product && product.stock > 0;
-    }).length ?? 0;
-
+  // ====== MAIN RENDER ======
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
@@ -485,7 +307,9 @@ const ProductDetail = () => {
             {/* Action Buttons */}
             <div className="flex gap-3 mb-6">
               <button
-                onClick={handleBuyNowClick}
+                onClick={() =>
+                  handleBuyNowClick(userId, () => setIsCartOpen(true))
+                }
                 disabled={product.stock === 0 || actionLoading}
                 className="flex-1 bg-black text-white py-3 cursor-pointer rounded-lg font-semibold hover:bg-gray-800 transition flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
@@ -493,7 +317,7 @@ const ProductDetail = () => {
                 Mua ngay
               </button>
               <button
-                onClick={handleAddToCartClick}
+                onClick={() => handleAddToCartClick(userId)}
                 disabled={product.stock === 0 || actionLoading}
                 className="px-6 border-2 border-black cursor-pointer text-black rounded-lg hover:bg-gray-100 transition font-semibold disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
               >

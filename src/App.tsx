@@ -20,8 +20,8 @@ function App() {
           <Route path="/auth/success" element={<OAuthSuccess />} />
           <Route path="/login" element={<LoginAdmin />} />
           <Route path="/admin/dashboard" element={<DashboardAdmin />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

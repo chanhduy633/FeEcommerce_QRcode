@@ -8,7 +8,7 @@ export const useHomepageViewModel = () => {
   // 🧩 Lấy UseCases từ dependency injection
   const {
     getAllProductsUseCase,
-    getProductByIdUseCase,
+    // getProductByIdUseCase,
     getCartUseCase,
     addToCartUseCase,
     updateCartItemUseCase,
@@ -43,13 +43,13 @@ export const useHomepageViewModel = () => {
     }
   };
 
-  const getProductById = async (id: string) => {
-    try {
-      return await getProductByIdUseCase.execute(id);
-    } catch {
-      toast.error("Không thể tải thông tin sản phẩm!");
-    }
-  };
+  // const getProductById = async (id: string) => {
+  //   try {
+  //     return await getProductByIdUseCase.execute(id);
+  //   } catch {
+  //     toast.error("Không thể tải thông tin sản phẩm!");
+  //   }
+  // };
 
   useEffect(() => {
     getAllProducts();
@@ -235,6 +235,6 @@ export const useHomepageViewModel = () => {
     handleBuyNow,
     handleUpdateQuantity,
     handleRemoveItem,
-    getProductById,
+    // getProductById,
   };
 };

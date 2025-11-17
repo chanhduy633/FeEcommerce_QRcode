@@ -12,6 +12,7 @@ import CartSidebar from "./components/CartSideBar";
 import { getGuestId } from "../../../utils/guestId";
 import TrustBadges from "./components/TrustBadges";
 import type { IProduct } from "../../../types/Product";
+import { useNavigate } from "react-router";
 
 const Homepage = () => {
   const [user, setUser] = useState<any>(null);
@@ -44,7 +45,7 @@ const Homepage = () => {
     handleUpdateQuantity,
     handleRemoveItem,
   } = useHomepageViewModel();
-
+  const navigate = useNavigate();
   // 🧩 Khôi phục user khi reload
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -73,12 +74,8 @@ const Homepage = () => {
     fetchCart(getGuestId());
   };
   const handleProductSelect = (product: IProduct) => {
-    // ✅ THÊM
-    const element = document.getElementById(`product-${product.id}`);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  };
+  navigate(`/product/${product.id}`);
+};
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>Lỗi: {error}</div>;
 

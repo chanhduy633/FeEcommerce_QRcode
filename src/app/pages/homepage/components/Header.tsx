@@ -67,32 +67,31 @@ const Header: React.FC<HeaderProps> = ({
   const handleSearchChange = (value: string) => {
     setSearchTerm(value); // ✅ cập nhật local state
     setShowSuggestions(value.length > 0);
+    onSearchChange(value);
   };
 
   const handleProductSelect = (product: IProduct) => {
-    const element = document.getElementById(`product-${product.id}`);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    setShowSuggestions(false);
+    onProductSelect?.(product);
   };
 
   const clearSearch = () => {
-    // ✅ THÊM
     onSearchChange("");
     setShowSuggestions(false);
+    onSearchChange("");
   };
 
   const formatPrice = (price: number) => {
-    // ✅ THÊM
     return new Intl.NumberFormat("vi-VN").format(price);
   };
 
   // Filter products
-  const filteredProducts = products // ✅ THÊM
+  const filteredProducts = products
     .filter((product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .slice(0, 5);
+
   const getInitials = (name?: string) => {
     if (!name) return "U";
     return name
@@ -121,7 +120,7 @@ const Header: React.FC<HeaderProps> = ({
             {/* Logo + Menu button */}
             <div className="flex items-center gap-2">
               <button
-                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg cursor-pointer transition"
                 onClick={onMenuToggle} // ✅ toggle parent state
               >
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -172,7 +171,7 @@ const Header: React.FC<HeaderProps> = ({
                           <button
                             key={product.id}
                             onClick={() => handleProductSelect(product)}
-                            className="w-full px-4 py-3 hover:bg-gray-50 flex items-center space-x-3 border-b border-gray-50 last:border-b-0"
+                            className="w-full px-4 py-3 hover:bg-gray-50 flex items-center cursor-pointer space-x-3 border-b border-gray-50 last:border-b-0"
                           >
                             <img
                               src={product.image_url}
