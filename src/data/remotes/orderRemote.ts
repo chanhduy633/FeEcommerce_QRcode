@@ -1,4 +1,5 @@
 import { API_ROUTES } from "../../config/api";
+import type { Order } from "../../types/Order";
 
 export class OrderRemote {
   async getAll(): Promise<any[]> {
@@ -24,5 +25,17 @@ export class OrderRemote {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Không thể lấy chi tiết đơn hàng");
     return data.data;
+  }
+
+  async createOrder(order: Order): Promise<any> {
+    const response = await fetch(API_ROUTES.ORDER, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(order),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Lỗi khi tạo đơn hàng");
+    return data;
   }
 }

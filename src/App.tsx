@@ -6,6 +6,7 @@ import DashboardAdmin from "./app/pages/admin/DashboardAdmin";
 import Homepage from "./app/pages/homepage/HomePage";
 import OAuthSuccess from "./app/pages/homepage/OAuthSuccess";
 import CheckoutPage from "./app/pages/CheckOut";
+import ProductDetail from "./app/pages/homepage/ProductDetail";
 function App() {
   return (
     <div className="min-h-screen w-full bg-background">
@@ -20,6 +21,7 @@ function App() {
           <Route path="/login" element={<LoginAdmin />} />
           <Route path="/admin/dashboard" element={<DashboardAdmin />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

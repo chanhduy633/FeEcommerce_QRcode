@@ -10,15 +10,19 @@ import Footer from "./components/Footer";
 import { Package } from "lucide-react";
 import CartSidebar from "./components/CartSideBar";
 import { getGuestId } from "../../../utils/guestId";
+import TrustBadges from "./components/TrustBadges";
+import type { IProduct } from "../../../types/Product";
 
 const Homepage = () => {
   const [user, setUser] = useState<any>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const {
     loading,
     error,
     products,
+    allProducts,
     totalPages,
     currentPage,
     setCurrentPage,
@@ -68,7 +72,13 @@ const Homepage = () => {
     toast.info("Đã đăng xuất.");
     fetchCart(getGuestId());
   };
-
+  const handleProductSelect = (product: IProduct) => {
+    // ✅ THÊM
+    const element = document.getElementById(`product-${product.id}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>Lỗi: {error}</div>;
 
@@ -77,22 +87,33 @@ const Homepage = () => {
       <Header
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
+        isMenuOpen={isMenuOpen}
+        onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
         categories={categories}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
-        cartItemCount={cart?.items?.length ?? 0}
+        cartItemCount={
+          cart?.items?.filter((item) => {
+            const product = allProducts.find((p) => p.id === item.productId);
+            return product && product.stock > 0;
+          }).length ?? 0
+        }
         onCartClick={() => setIsCartOpen(true)}
         isLoggedIn={!!user}
         userInfo={user}
         onLoginSuccess={handleLoginSuccess}
         onLogout={handleLogout}
+        products={allProducts} // ✅ THÊM - truyền products từ viewModel
+        onProductSelect={handleProductSelect} // ✅ THÊM
       />
-
+      <TrustBadges />
       <div className="flex">
         <SidebarHome
           categories={categories}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
+          isMenuOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
         />
 
         <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[70vh]">

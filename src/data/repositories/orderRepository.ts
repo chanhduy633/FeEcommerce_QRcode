@@ -1,3 +1,4 @@
+import type { Order } from "../../types/Order";
 import { OrderRemote } from "../remotes/orderRemote";
 
 export class OrderRepository {
@@ -12,6 +13,9 @@ export class OrderRepository {
 
   async updateOrderStatus(orderId: string, status: string) {
     return await this.remote.updateStatus(orderId, status);
+  }
+  async createOrder(order: Order): Promise<Order> {
+    return await this.remote.createOrder(order);
   }
 
   async getOrderById(orderId: string) {

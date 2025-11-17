@@ -57,13 +57,22 @@ export const useHomepageViewModel = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, searchTerm, priceRange, sortBy]);
+  }, [selectedCategory, priceRange, sortBy]);
 
   // ====== CART ======
   const fetchCart = async (userId: string) => {
     try {
       const data = await getCartUseCase.execute(userId);
-      setCart(data);
+
+      // 🧹 Lọc bỏ sản phẩm có quantity <= 0
+      const filteredItems = Array.isArray(data.items)
+        ? data.items.filter((item) => item.quantity > 0)
+        : [];
+
+      setCart({
+        ...data,
+        items: filteredItems,
+      });
     } catch {
       toast.error("Không thể tải giỏ hàng!");
     }
@@ -75,6 +84,11 @@ export const useHomepageViewModel = () => {
     quantityToAdd = 1
   ) => {
     try {
+      console.log("📤 Sending to API:", {
+        userId,
+        productId: product.id, // ← Phải là product.id chứ không phải product._id
+        quantity: quantityToAdd,
+      });
       // Lấy số lượng sản phẩm hiện có trong giỏ
       const cartItems = cart?.items ?? []; // nếu cart null thì coi như rỗng
       const existingItem = cartItems.find(
@@ -88,7 +102,7 @@ export const useHomepageViewModel = () => {
       const remaining = Math.max(maxStock - currentQuantity, 0);
 
       if (quantityToAdd > remaining) {
-        toast.error(`Chỉ còn ${remaining} sản phẩm trong kho`);
+        toast.error(`Chỉ còn ${maxStock} sản phẩm trong kho`);
         return;
       }
       // Nếu hợp lệ, thêm vào giỏ
@@ -200,6 +214,7 @@ export const useHomepageViewModel = () => {
     loading,
     error,
     products: paginatedProducts,
+    allProducts: products,
     totalPages,
     currentPage,
     setCurrentPage,

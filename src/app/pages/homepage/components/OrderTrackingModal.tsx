@@ -3,9 +3,6 @@ import {
   X,
   Package,
   Calendar,
-  MapPin,
-  Phone,
-  Mail,
   User,
   CreditCard,
   MessageCircle,
@@ -13,6 +10,7 @@ import {
   CheckCircle,
   Clock,
   Truck,
+  Binoculars,
 } from "lucide-react";
 import { API_ROUTES } from "../../../../config/api";
 import { toast } from "sonner";
@@ -41,6 +39,7 @@ interface ShippingAddress {
 }
 
 interface OrderData {
+  _id: string;
   orderNumber: string;
   status: string;
   createdAt: string;
@@ -113,26 +112,28 @@ const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({ isOpen, onClose
   };
 
   const handleCancelOrder = async () => {
-    if (!orderData) return;
+  if (!orderData) return;
 
-    try {
-      const res = await fetch(`${API_ROUTES.ORDER}/${orderNumber}/status`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await res.json();
+  try {
+    const res = await fetch(`${API_ROUTES.ORDER}/${orderData._id}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "cancelled" }), // nhớ gửi status
+    });
+    const data = await res.json();
 
-      if (res.ok) {
-        toast.success("Hủy đơn hàng thành công!");
-        setShowCancelConfirm(false);
-        setOrderData({ ...orderData, status: "cancelled" });
-      } else {
-        toast.error(data.message || "Không thể hủy đơn hàng.");
-      }
-    } catch (err) {
-      toast.error("Lỗi kết nối máy chủ!");
+    if (res.ok) {
+      toast.success("Hủy đơn hàng thành công!");
+      setShowCancelConfirm(false);
+      setOrderData({ ...orderData, status: "cancelled" });
+    } else {
+      toast.error(data.message || "Không thể hủy đơn hàng.");
     }
-  };
+  } catch (err) {
+    toast.error("Lỗi kết nối máy chủ!");
+  }
+};
+
 
   const handleClose = () => {
     setOrderNumber("");
@@ -150,10 +151,10 @@ const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({ isOpen, onClose
         {/* Header */}
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-bold flex items-center gap-2 text-gray-800">
-            <Package className="text-blue-600" />
+            <Binoculars className="text-black" />
             Tra cứu đơn hàng
           </h2>
-          <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={handleClose} className="text-gray-500 hover:text-gray-700 cursor-pointer">
             <X size={24} />
           </button>
         </div>
@@ -177,7 +178,7 @@ const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({ isOpen, onClose
               <button
                 onClick={handleSearch}
                 disabled={isLoading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-6 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition cursor-pointer"
               >
                 {isLoading ? "Đang tìm..." : "Tra cứu"}
               </button>
@@ -274,10 +275,11 @@ const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({ isOpen, onClose
                     <CreditCard className="text-blue-600" />
                     <span className="font-semibold">Phương thức thanh toán</span>
                   </div>
+                  
                   <span>
                     {orderData.paymentMethod === "COD"
                       ? "Thanh toán khi nhận hàng"
-                      : orderData.paymentMethod}
+                      : "Đã thanh toán trước"}
                   </span>
                 </div>
                 <div className="border-t pt-4 flex justify-between items-center">
@@ -292,14 +294,14 @@ const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({ isOpen, onClose
               <div className="flex gap-3 justify-end">
                 <button
                   onClick={() => alert("Liên hệ CSKH")}
-                  className="flex items-center gap-2 px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50"
+                  className="flex items-center gap-2 px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 cursor-pointer"
                 >
                   <MessageCircle size={18} /> Liên hệ
                 </button>
                 {orderData.status !== "cancelled" && orderData.status !== "delivered" && (
                   <button
                     onClick={() => setShowCancelConfirm(true)}
-                    className="flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    className="flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer"
                   >
                     <XCircle size={18} /> Hủy đơn hàng
                   </button>
@@ -323,13 +325,13 @@ const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({ isOpen, onClose
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
-                className="px-4 py-2 border rounded-lg"
+                className="px-4 py-2 border rounded-lg cursor-pointer"
               >
                 Không
               </button>
               <button
                 onClick={handleCancelOrder}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer"
               >
                 Xác nhận hủy
               </button>

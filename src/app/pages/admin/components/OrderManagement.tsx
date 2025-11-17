@@ -13,8 +13,8 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 };
 
 const paymentLabels: Record<string, string> = {
-  COD: "Thanh toán khi nhận hàng",
-  BANK: "Chuyển khoản ngân hàng",
+  COD: "Trả sau",
+  BANK_TRANSFER: "Đã thanh toán",
   SEPAY: "SePay",
 };
 
@@ -94,55 +94,61 @@ export default function OrderManagement() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {orders.map((o) => (
-              <tr key={o._id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3 font-medium text-gray-800">
-                  {o.orderNumber}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-700">
-                  <div>{o.shippingAddress?.name || "—"}</div>
-                  <div className="text-xs text-gray-500">
-                    {o.shippingAddress?.phone || "Không có SĐT"}
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-sm">
-                  {formatCurrency(o.totalAmount)}
-                </td>
-                <td className="px-4 py-3 text-sm">
-                  {paymentLabels[o.paymentMethod || "COD"]}
-                </td>
-                <td className="px-4 py-3 text-sm">{formatDate(o.createdAt)}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`px-2 py-1 text-xs rounded font-medium ${
-                      statusConfig[o.status]?.color || "bg-gray-100"
-                    }`}
-                  >
-                    {statusConfig[o.status]?.label || o.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right flex items-center gap-2 justify-end">
-                  <button
-                    onClick={() => openDetail(o)}
-                    className="text-blue-600 hover:text-blue-800"
-                    title="Xem chi tiết"
-                  >
-                    <Eye className="w-5 h-5" />
-                  </button>
-                  <select
-                    value={o.status}
-                    onChange={(e) => updateOrderStatus(o._id, e.target.value)}
-                    className="text-sm border rounded px-2 py-1 focus:ring-blue-500 focus:outline-none cursor-pointer"
-                  >
-                    {Object.keys(statusConfig).map((s) => (
-                      <option key={s} value={s}>
-                        {statusConfig[s].label}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-              </tr>
-            ))}
+            {orders.map((o) => {
+             
+              return (
+                <tr key={o._id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-4 py-3 font-medium text-gray-800">
+                    {o.orderNumber}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    <div>{o.shippingAddress?.name || "—"}</div>
+                    <div className="text-xs text-gray-500">
+                      {o.shippingAddress?.phone || "Không có SĐT"}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    {formatCurrency(o.totalAmount)}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    {paymentLabels[o.payment?.method || "COD"]}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    {formatDate(o.createdAt)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-2 py-1 text-xs rounded font-medium ${
+                        statusConfig[o.status]?.color || "bg-gray-100"
+                      }`}
+                    >
+                      {statusConfig[o.status]?.label || o.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right flex items-center gap-2 justify-end">
+                    <button
+                      onClick={() => openDetail(o)}
+                      className="text-blue-600 hover:text-blue-800"
+                      title="Xem chi tiết"
+                    >
+                      <Eye className="w-5 h-5" />
+                    </button>
+                    <select
+                      value={o.status}
+                      onChange={(e) => updateOrderStatus(o._id, e.target.value)}
+                      className="text-sm border rounded px-2 py-1 focus:ring-blue-500 focus:outline-none cursor-pointer"
+                      disabled={o.status === "cancelled"}
+                    >
+                      {Object.keys(statusConfig).map((s) => (
+                        <option key={s} value={s}>
+                          {statusConfig[s].label}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         {orders.length === 0 && (
@@ -281,7 +287,7 @@ export default function OrderManagement() {
                     </span>
                   </div>
                   <span className="text-gray-700">
-                    {paymentLabels[selectedOrder.paymentMethod || "COD"]}
+                    {paymentLabels[selectedOrder.payment?.method || "COD"]}
                   </span>
                 </div>
                 <div className="mt-3 border-t pt-3 flex justify-between items-center">

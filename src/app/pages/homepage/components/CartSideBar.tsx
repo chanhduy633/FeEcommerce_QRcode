@@ -33,20 +33,31 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
       currency: "VND",
     }).format(price);
 
-  const totalAmount = cartItems.reduce((sum, item) => {
+  // Lọc các item còn hàng
+  const availableItems = cartItems.filter(
+    (item) => (item.product?.stock ?? Infinity) > 0
+  );
+
+  // Tính tổng
+  const totalAmount = availableItems.reduce((sum, item) => {
     const price = item.product?.price ?? item.price ?? 0;
     return sum + price * (item.quantity ?? 0);
   }, 0);
 
-  // 🟢 Hàm xử lý chuyển đến trang thanh toán
+  // Khi checkout
   const handleCheckout = () => {
-    if (cartItems.length === 0) {
+    if (availableItems.length === 0) {
       toast.error("Giỏ hàng trống!");
       return;
     }
-    onClose(); // đóng sidebar trước
-    localStorage.setItem("checkoutData", JSON.stringify({ cartItems, totalAmount }));
-    navigate("/checkout", { state: { cartItems, totalAmount } }); // truyền dữ liệu sang trang thanh toán
+    onClose();
+    localStorage.setItem(
+      "checkoutData",
+      JSON.stringify({ cartItems: availableItems, totalAmount })
+    );
+    navigate("/checkout", {
+      state: { cartItems: availableItems, totalAmount },
+    });
   };
 
   return (
@@ -69,10 +80,10 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center space-x-2">
-              <ShoppingCart className="text-blue-600" size={24} />
+              <ShoppingCart className="text-black" size={24} />
               <h2 className="text-xl font-bold text-gray-800">Giỏ hàng</h2>
               <span className="bg-blue-100 text-blue-600 text-sm px-2 py-1 rounded-full">
-                {cartItems.length}
+                {availableItems.length} sản phẩm
               </span>
             </div>
             <button
@@ -85,14 +96,14 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
 
           {/* Cart items */}
           <div className="flex-1 overflow-y-auto p-4">
-            {cartItems.length === 0 ? (
+            {availableItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-400">
                 <ShoppingCart size={64} className="mb-4" />
                 <p>Giỏ hàng trống</p>
               </div>
             ) : (
               <div className="space-y-4">
-                {cartItems.map((item) => {
+                {availableItems.map((item) => {
                   const id = item.product?._id ?? item.productId;
                   const name = item.product?.name ?? "Sản phẩm";
                   const image = item.product?.image ?? "/placeholder.png";
@@ -115,6 +126,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                       onUpdateQuantity(userId, id, quantity - 1);
                     }
                   };
+
                   return (
                     <div
                       key={id}
@@ -178,14 +190,14 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                 <span className="text-lg font-semibold text-gray-700">
                   Tổng cộng:
                 </span>
-                <span className="text-2xl font-bold text-blue-600">
+                <span className="text-2xl font-bold text-black">
                   {formatPrice(totalAmount)}
                 </span>
               </div>
               {/* 🟢 Nút thanh toán */}
               <button
                 onClick={handleCheckout}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 cursor-pointer"
+                className="flex-1 w-full py-2.5 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition cursor-pointer"
               >
                 Thanh toán
               </button>

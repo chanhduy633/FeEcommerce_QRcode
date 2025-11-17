@@ -34,3 +34,19 @@ export interface Order {
   items?: OrderItem[];
   notes?: string;
 }
+
+export interface CreateOrderInput {
+  userId?: string | null;
+  guestId?: string | null;
+  shippingAddress: ShippingAddress;
+  notes?: string;
+  paymentMethod: string;
+  cartItems: {
+    productId: string;
+    quantity: number;
+  }[];
+}
+
+export interface CreateOrderResponse {
+  data: Order;
+}
