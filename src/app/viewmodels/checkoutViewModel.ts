@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { provinces, districts, wards } from "vietnam-provinces";
 import { createOrderUseCase } from "../orderDependencies";
@@ -33,7 +33,17 @@ export const useCheckoutViewModel = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [pendingOrderData, setPendingOrderData] = useState<Order | null>(null);
 
-  // ---------- Load user + cart ----------
+  const cancelPollingRef = useRef<(() => void) | null>(null);
+  const currentTotalAmountRef = useRef(0);
+  // Cleanup khi component unmount
+  useEffect(() => {
+    return () => {
+      if (cancelPollingRef.current) {
+        cancelPollingRef.current();
+      }
+    };
+  }, []);
+
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("user");
@@ -44,22 +54,29 @@ export const useCheckoutViewModel = () => {
         setIsLoggedIn(Boolean(userData?.email));
       }
 
-      const checkoutData = localStorage.getItem("checkoutData");
-      if (checkoutData) {
-        const data = JSON.parse(checkoutData);
-        setCartItems(data.cartItems || []);
-        setTotalAmount(
-          (data.cartItems || []).reduce(
-            (sum: number, item: any) => sum + item.price * item.quantity,
-            0
-          )
+      const checkoutDataRaw = localStorage.getItem("checkoutData");
+      if (checkoutDataRaw) {
+        const checkoutData = JSON.parse(checkoutDataRaw);
+        const cartItemsLocal = checkoutData.cartItems || [];
+
+        // ✅ Tính toán totalAmountLocal với kiểm tra giá trị hợp lệ
+        const totalAmountLocal = cartItemsLocal.reduce(
+          (sum: number, item: any) => {
+            const price = item.price || 0;
+            const quantity = item.quantity || 0;
+            const itemTotal = Number(price) * Number(quantity);
+            return sum + (isNaN(itemTotal) ? 0 : itemTotal);
+          },
+          0
         );
+
+        setCartItems(cartItemsLocal);
+        setTotalAmount(totalAmountLocal); // ✅ Cập nhật state.totalAmount
       }
     } catch (err) {
       console.error("Không thể đọc user/cart từ localStorage:", err);
     }
   }, []);
-  
 
   // ---------- Validation ----------
   const validateEmail = (emailValue: string) => {
@@ -158,13 +175,20 @@ export const useCheckoutViewModel = () => {
 
   // ---------- COD checkout ----------
   const handleCheckoutCOD = async () => {
-    if (!validateEmail(email) || !validatePhone(phone) || !validateShippingAddress()) return;
+    if (
+      !validateEmail(email) ||
+      !validatePhone(phone) ||
+      !validateShippingAddress()
+    )
+      return;
     if (cartItems.length === 0) return toast.error("Giỏ hàng trống");
 
     setIsLoading(true);
     try {
       const orderData = buildOrderData("COD");
+      console.log("Order data for COD:", orderData);
       const result = await createOrderUseCase.execute(orderData);
+
       const newOrderNumber = result.data.orderNumber || "N/A";
 
       setOrderNumber(newOrderNumber);
@@ -182,54 +206,205 @@ export const useCheckoutViewModel = () => {
   };
 
   // ---------- QR checkout ----------
- const handleCheckoutQR = async () => {
-  if (!validateEmail(email) || !validatePhone(phone) || !validateShippingAddress()) return;
+const handleCheckoutQR = async () => {
+  if (
+    !validateEmail(email) ||
+    !validatePhone(phone) ||
+    !validateShippingAddress()
+  )
+    return;
   if (cartItems.length === 0) return toast.error("Giỏ hàng trống");
 
-  // Không tạo đơn hàng ở đây — chỉ lưu dữ liệu tạm và mở QR modal
-  const orderData = buildOrderData("BANK_TRANSFER");
-  setPendingOrderData(orderData);
-  setShowQrModal(true);
-};
-
-  // ---------- Confirm QR Payment ----------
-const handleConfirmPayment = async () => {
-  if (!pendingOrderData) return;
-  setIsCheckingPayment(true);
+  setIsLoading(true);
 
   try {
-    // Giả lập chờ người dùng thanh toán
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // ✅ 1. Lấy lại dữ liệu từ localStorage để đảm bảo chính xác
+    const checkoutDataRaw = localStorage.getItem("checkoutData");
+    if (!checkoutDataRaw) {
+      toast.error("Không tìm thấy giỏ hàng");
+      return;
+    }
 
-    // ✅ Chỉ tạo đơn hàng khi xác nhận thanh toán
-    const result = await createOrderUseCase.execute(pendingOrderData);
-    const newOrderNumber = result.data.orderNumber || "N/A";
+    const checkoutData = JSON.parse(checkoutDataRaw);
+    const cartItemsLocal = checkoutData.cartItems || [];
 
-    setOrderNumber(newOrderNumber);
-    setPendingOrderData(null);
-    setShowQrModal(false);
-    setShowModal(true);
+    // ✅ LẤY TRỰC TIẾP totalAmount từ checkoutData
+    const totalAmountLocal = checkoutData.totalAmount || 0;
 
-    // Xóa dữ liệu checkout + giỏ hàng
-    localStorage.removeItem("checkoutData");
-    setCartItems([]);
-    setTotalAmount(0);
+    console.log("✅ Checkout QR - totalAmountLocal:", totalAmountLocal); // ✅ Debug log
 
-    toast.success("Thanh toán thành công!");
+    if (cartItemsLocal.length === 0) {
+      toast.error("Giỏ hàng trống");
+      return;
+    }
+
+    if (totalAmountLocal <= 0) {
+      toast.error("Tổng tiền không hợp lệ");
+      return;
+    }
+
+    // ✅ 2. Tạo mã đơn hàng tạm
+    const tempOrderNumber = `ORD-${Date.now()}`;
+    setOrderNumber(tempOrderNumber);
+
+    // ✅ 3. Cập nhật lại state (tùy chọn)
+    setCartItems(cartItemsLocal);
+    setTotalAmount(totalAmountLocal); // Đồng bộ lại UI
+
+    // ✅ 4. Tạo order data với totalAmountLocal
+    const orderData = buildOrderData("BANK_TRANSFER");
+    console.log("Order data for QR payment:", orderData);
+    orderData.totalAmount = totalAmountLocal; // ✅ Ghi đè để chắc chắn
+
+    setPendingOrderData(orderData);
+
+    // ✅ 5. Hiển thị modal QR
+    setShowQrModal(true);
+
+    // ✅ 6. Bắt đầu polling với totalAmountLocal (không dùng state)
+    startPaymentPolling(tempOrderNumber, totalAmountLocal, orderData);
   } catch (err: any) {
-    console.error("Confirm payment error:", err);
-    toast.error("Chưa nhận được thanh toán. Vui lòng thử lại.");
+    console.error("Checkout QR error:", err);
+    toast.error(err?.message || "Có lỗi xảy ra, vui lòng thử lại.");
   } finally {
-    setIsCheckingPayment(false);
+    setIsLoading(false);
   }
 };
+  // ✅ Bắt đầu polling thanh toán → Tạo order khi đã thanh toán
+  const startPaymentPolling = async (
+    orderNum: string,
+    amount: number,
+    orderData: Order
+  ) => {
+    // Cancel polling cũ nếu có
+    if (cancelPollingRef.current) {
+      cancelPollingRef.current();
+    }
 
+    setIsCheckingPayment(true);
+
+    const onSuccess = async () => {
+      console.log("✅ Thanh toán thành công! Đang lưu đơn hàng...");
+
+      try {
+        // ✅ Tạo order trên backend SAU KHI đã nhận tiền
+        const result = await createOrderUseCase.execute(orderData);
+        const finalOrderNumber = result.data.orderNumber || orderNum;
+
+        setOrderNumber(finalOrderNumber);
+        setShowQrModal(false);
+        setShowModal(true);
+
+        // Xóa giỏ hàng
+        localStorage.removeItem("checkoutData");
+        setCartItems([]);
+        setTotalAmount(0);
+        setPendingOrderData(null);
+
+        // ✅ Cập nhật lại ref sau khi xóa giỏ hàng
+        currentTotalAmountRef.current = 0;
+
+        toast.success("Thanh toán thành công! Đơn hàng đã được xác nhận.");
+      } catch (err: any) {
+        console.error("Error saving order after payment:", err);
+        toast.error(
+          "Đã nhận tiền nhưng lỗi lưu đơn hàng. Vui lòng liên hệ CSKH."
+        );
+      } finally {
+        setIsCheckingPayment(false);
+      }
+    };
+
+    const onTimeout = () => {
+      console.log("⏱️ Hết thời gian chờ thanh toán");
+      setIsCheckingPayment(false);
+      toast.error(
+        "Chưa nhận được thanh toán. Vui lòng thử lại hoặc liên hệ hỗ trợ."
+      );
+    };
+
+    // Bắt đầu polling
+    const cancelFn = await pollPaymentFromBackend(
+      orderNum,
+      amount, // ✅ Dùng `amount` đã được truyền vào
+      onSuccess,
+      onTimeout
+    );
+
+    cancelPollingRef.current = cancelFn;
+  };
+
+  // ✅ FIX: Polling gọi backend API để check thanh toán
+  const pollPaymentFromBackend = async (
+    orderNum: string,
+    amount: number, // ✅ Nhận `amount` từ tham số
+    onSuccess: () => void,
+    onTimeout: () => void
+  ): Promise<() => void> => {
+    let retries = 0;
+    const MAX_RETRIES = 40; // 2 phút (40 x 3s)
+    const INTERVAL = 3000; // 3 giây
+
+    const checkPayment = async () => {
+      retries++;
+
+      try {
+        // ✅ Gửi `amount` được truyền vào từ tham số, không dùng `state.totalAmount`
+        const response = await fetch(
+          `http://localhost:5317/api/payment/check-sepay`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              orderNumber: orderNum,
+              totalAmount: amount, // ✅ Dùng `amount` tham số
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.success && data.isPaid) {
+          clearInterval(intervalId);
+          onSuccess();
+          return;
+        }
+
+        if (retries >= MAX_RETRIES) {
+          clearInterval(intervalId);
+          onTimeout();
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking payment:", error);
+        if (retries >= MAX_RETRIES) {
+          clearInterval(intervalId);
+          onTimeout();
+        }
+      }
+    };
+
+    // Kiểm tra ngay lập tức
+    await checkPayment();
+
+    const intervalId: number = window.setInterval(checkPayment, INTERVAL);
+
+    // Return function để cancel polling
+    return () => clearInterval(intervalId);
+  };
+  const handleCloseQr = () => {
+    // Cancel polling khi đóng modal
+    if (cancelPollingRef.current) {
+      cancelPollingRef.current();
+    }
+    setShowQrModal(false);
+    setIsCheckingPayment(false);
+  };
 
   const handleFinish = () => {
     setShowModal(false);
     window.location.href = "/";
   };
-  const handleCloseQr = () => setShowQrModal(false);
 
   return {
     state: {
@@ -272,7 +447,6 @@ const handleConfirmPayment = async () => {
     handleWardChange,
     handleCheckoutCOD,
     handleCheckoutQR,
-    handleConfirmPayment,
     handleFinish,
     handleCloseQr,
     validatePhone,

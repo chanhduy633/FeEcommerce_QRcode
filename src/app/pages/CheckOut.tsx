@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle2, CreditCard } from "lucide-react";
+import { CheckCircle2, CreditCard, Loader2, Wallet } from "lucide-react";
 import { useCheckoutViewModel } from "../viewmodels/checkoutViewModel";
 
 export default function CheckoutPage() {
@@ -53,38 +53,72 @@ export default function CheckoutPage() {
           </div>
         </div>
       )}
-      {/* ✅ QR PAYMENT MODAL */}
+     {/* ✅ QR PAYMENT MODAL - CHỈ HIỂN THỊ QR VÀ LOADING */}
       {state.showQrModal && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center animate-fadeIn">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
             <h2 className="text-2xl font-semibold mb-2 text-gray-800">
               Quét mã QR để thanh toán
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
               Sử dụng ứng dụng ngân hàng để quét mã và thanh toán đơn hàng.
             </p>
-            <img
-              src={`https://img.vietqr.io/image/VCB-1028005716-compact.png?amount=${totalAmount}&addInfo=Thanh+toan+don+hang+${state.orderNumber}`}
-              alt="QR thanh toán"
-              className="w-64 h-64 mx-auto rounded-lg border"
-            />
             
-            {/* Giữ giỏ hàng → đóng modal thôi */}
+            {/* QR CODE - SEPAY BIDV */}
+            <div className="relative">
+              <img 
+                src={`https://qr.sepay.vn/img?acc=96247DUYBIDV&bank=BIDV&amount=${totalAmount}&des=${state.orderNumber}`}
+                alt="QR thanh toán"
+                className="w-64 h-64 mx-auto rounded-lg border-2 border-gray-200 shadow-sm"
+              />
+              
+            </div>
+
+            {/* Thông tin thanh toán */}
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-gray-600">Số tiền:</span>
+                <span className="font-bold text-blue-600">
+                  {formatPrice(totalAmount)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Mã giao dịch:</span>
+                <span className="font-mono text-gray-800">
+                  {state.orderNumber}
+                </span>
+              </div>
+            </div>
+
+            {/* Status Message */}
+            <div className="mt-6 flex items-center justify-center gap-2">
+              {state.isCheckingPayment ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
+                  <span className="text-sm text-blue-600 font-medium">
+                    Đang kiểm tra thanh toán tự động...
+                  </span>
+                </>
+              ) : (
+                <span className="text-sm text-gray-500">
+                  Quét mã QR để thanh toán
+                </span>
+              )}
+            </div>
+
+            {/* Nút Hủy */}
             <button
-              onClick={viewModel.handleCloseQr}
-              className="mt-6 mr-4 bg-blue-600 text-white px-6 py-2 rounded-md font-medium hover:bg-blue-700 transition cursor-pointer"
-            >
-              Hủy
+            onClick={() => viewModel.handleCloseQr()}
+             className="mt-6 text-gray-600 hover:text-gray-800 text-sm font-medium transition">
+              Hủy thanh toán
             </button>
-            <button
-              onClick={viewModel.handleConfirmPayment}
-              disabled={state.isCheckingPayment}
-              className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {state.isCheckingPayment
-                ? "Đang xác nhận..."
-                : "Xác nhận đã thanh toán"}
-            </button>
+
+            {/* Hướng dẫn */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <p className="text-xs text-gray-500 text-left">
+                <strong>Lưu ý:</strong> Sau khi thanh toán thành công, đơn hàng sẽ được xác nhận tự động trong vòng vài giây.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -286,9 +320,7 @@ export default function CheckoutPage() {
                         onChange={() => viewModel.setPaymentMethod("card")}
                         className="w-4 h-4 text-blue-600"
                       />
-                      <span className="ml-3 font-medium">
-                        OnePAY - Credit/ATM card/QR
-                      </span>
+                      <span className="ml-3 font-medium">SePay - Ví điện tử & Thẻ ngân hàng</span>
                     </div>
                     <div className="flex gap-2">
                       <CreditCard className="w-6 h-6 text-gray-400" />
@@ -297,12 +329,18 @@ export default function CheckoutPage() {
                   </div>
                 </div>
                 {state.paymentMethod === "card" && (
-                  <div className="p-4 bg-gray-50 text-sm text-gray-600 text-center border-b border-gray-300">
-                    <div className="flex justify-center mb-3">
-                      <CreditCard className="w-16 h-16 text-gray-400" />
+                  <div className="p-4 bg-gray-50 text-sm text-gray-600 border-b border-gray-300">
+                    <div className="flex items-start gap-3">
+                      <Wallet className="w-12 h-12 text-blue-600 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium mb-2">Thanh toán an toàn với SePay</p>
+                        <ul className="text-xs space-y-1 text-gray-600">
+                          <li>• Hỗ trợ: Ví điện tử, ATM, Visa, MasterCard</li>
+                          <li>• Bảo mật: Mã hóa SSL 256-bit</li>
+                          <li>• Nhanh chóng: Xác nhận thanh toán tức thì</li>
+                        </ul>
+                      </div>
                     </div>
-                    Sau khi nhấp vào "Thanh toán ngay", bạn sẽ nhận mã QR,
-                    chuyển để hoàn tất.
                   </div>
                 )}
 
