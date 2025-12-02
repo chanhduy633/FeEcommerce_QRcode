@@ -20,6 +20,7 @@ import { getGuestId } from "../../../utils/guestId";
 import type { IProduct } from "../../../types/Product";
 import { useProductDetailViewModel } from "../../viewmodels/productDetailViewModel";
 import { useParams } from "react-router-dom";
+import FloatingContactButtons from "./components/FloatingContactButtons";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
@@ -507,6 +508,7 @@ const ProductDetail = () => {
           </div>
         </div>
       )}
+      <FloatingContactButtons />
     </div>
   );
 };

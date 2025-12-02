@@ -20,77 +20,151 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   onSortChange,
   totalProducts,
 }) => {
+  // Hàm format số thành dạng có khoảng trắng: 10000000 → 10 000 000
+  const formatNumberWithSpaces = (num: number): string => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  };
+
+  // Hàm xóa khoảng trắng khi parse: "10 000 000" → 10000000
+  const parseFormattedNumber = (str: string): number => {
+    const cleaned = str.replace(/\s/g, "");
+    return Number(cleaned) || 0;
+  };
+
+  // State để lưu giá trị hiển thị (có format)
+  const [minDisplay, setMinDisplay] = React.useState(
+    formatNumberWithSpaces(priceRange[0])
+  );
+  const [maxDisplay, setMaxDisplay] = React.useState(
+    formatNumberWithSpaces(priceRange[1])
+  );
+
+  // Sync với priceRange từ props
+  React.useEffect(() => {
+    setMinDisplay(formatNumberWithSpaces(priceRange[0]));
+    setMaxDisplay(formatNumberWithSpaces(priceRange[1]));
+  }, [priceRange]);
+
+  const handleMinChange = (value: string) => {
+    setMinDisplay(value);
+    const numValue = parseFormattedNumber(value);
+    onPriceRangeChange([numValue, priceRange[1]]);
+  };
+
+  const handleMaxChange = (value: string) => {
+    setMaxDisplay(value);
+    const numValue = parseFormattedNumber(value);
+    onPriceRangeChange([priceRange[0], numValue]);
+  };
+
+  const handleMinBlur = () => {
+    setMinDisplay(formatNumberWithSpaces(priceRange[0]));
+  };
+
+  const handleMaxBlur = () => {
+    setMaxDisplay(formatNumberWithSpaces(priceRange[1]));
+  };
+
   return (
-    <div>
-      {/* Filter Controls */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div className="mb-6">
+      {/* Filter Controls - All in One Row */}
+      <div className="flex flex-wrap items-center gap-3 bg-white p-4 rounded-lg shadow-sm">
+        {/* Bộ lọc button */}
         <button
           onClick={onToggleFilters}
           className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
         >
-          <Filter size={20} />
-          <span>Bộ lọc</span>
+          <Filter size={18} />
+          <span className="text-sm font-medium">Bộ lọc</span>
           <ChevronDown
-            size={16}
+            size={14}
             className={`transform transition-transform ${
               showFilters ? "rotate-180" : ""
             }`}
           />
         </button>
 
-        <div className="flex items-center space-x-4">
-          <span className="text-gray-600">{totalProducts} sản phẩm</span>
-          <select
-            value={sortBy}
-            onChange={(e) => onSortChange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-          >
-            <option value="default">Mặc định</option>
-            <option value="popular">Bán chạy nhất</option>
-            <option value="price-asc">Giá thấp đến cao</option>
-            <option value="price-desc">Giá cao đến thấp</option>
-            <option value="name">Tên A-Z</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Filter Options */}
-      {showFilters && (
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h3 className="font-semibold mb-4">Lọc theo giá</h3>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
+        {/* Lọc theo giá - Inline */}
+        {showFilters && (
+          <>
+            <div className="flex items-center gap-2">
               <input
-                type="number"
+                type="text"
                 placeholder="Từ"
-                min="0"
-                value={priceRange[0]}
-                onChange={(e) =>
-                  onPriceRangeChange([Number(e.target.value), priceRange[1]])
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={minDisplay}
+                onChange={(e) => handleMinChange(e.target.value)}
+                onBlur={handleMinBlur}
+                className="w-28 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <span>-</span>
+              <span className="text-gray-400">-</span>
               <input
-                type="number"
+                type="text"
                 placeholder="Đến"
-                min="0"
-                value={priceRange[1]}
-                onChange={(e) =>
-                  onPriceRangeChange([priceRange[0], Number(e.target.value)])
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={maxDisplay}
+                onChange={(e) => handleMaxChange(e.target.value)}
+                onBlur={handleMaxBlur}
+                className="w-28 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
+            {/* Quick filter buttons */}
+            <div className="hidden lg:flex items-center gap-2">
+              <button
+                onClick={() => onPriceRangeChange([0, 500000])}
+                className="px-3 py-1.5 text-xs border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer whitespace-nowrap"
+              >
+                &lt; 500K
+              </button>
+              <button
+                onClick={() => onPriceRangeChange([500000, 1000000])}
+                className="px-3 py-1.5 text-xs border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer whitespace-nowrap"
+              >
+                500K-1M
+              </button>
+              <button
+                onClick={() => onPriceRangeChange([1000000, 5000000])}
+                className="px-3 py-1.5 text-xs border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer whitespace-nowrap"
+              >
+                1M-5M
+              </button>
+              <button
+                onClick={() => onPriceRangeChange([5000000, 100000000])}
+                className="px-3 py-1.5 text-xs border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer whitespace-nowrap"
+              >
+                &gt; 5M
+              </button>
+            </div>
+
             <button
               onClick={() => onPriceRangeChange([0, 100000000])}
-              className="text-blue-600 hover:text-blue-700 text-sm cursor-pointer"
+              className="text-blue-600 hover:text-blue-700 text-xs cursor-pointer font-medium"
             >
               Đặt lại
             </button>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+
+        {/* Spacer */}
+        <div className="flex-1"></div>
+
+        {/* Số sản phẩm */}
+        <span className="text-sm text-gray-600">
+          {formatNumberWithSpaces(totalProducts)} sản phẩm
+        </span>
+
+        {/* Sắp xếp */}
+        <select
+          value={sortBy}
+          onChange={(e) => onSortChange(e.target.value)}
+          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+        >
+          <option value="default">Mặc định</option>
+          <option value="popular">Bán chạy nhất</option>
+          <option value="price-asc">Giá thấp đến cao</option>
+          <option value="price-desc">Giá cao đến thấp</option>
+          <option value="name">Tên A-Z</option>
+        </select>
+      </div>
     </div>
   );
 };

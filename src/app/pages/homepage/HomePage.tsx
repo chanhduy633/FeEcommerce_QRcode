@@ -13,6 +13,8 @@ import { getGuestId } from "../../../utils/guestId";
 import TrustBadges from "./components/TrustBadges";
 import type { IProduct } from "../../../types/Product";
 import { useNavigate } from "react-router";
+import FloatingContactButtons from "./components/FloatingContactButtons";
+import Banner from "./components/Bannner";
 
 const Homepage = () => {
   const [user, setUser] = useState<any>(null);
@@ -113,7 +115,7 @@ const Homepage = () => {
           onClose={() => setIsMenuOpen(false)}
         />
 
-        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[70vh]">
+        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[70vh]">
           <FilterPanel
             showFilters={showFilters}
             onToggleFilters={() => setShowFilters(!showFilters)}
@@ -151,6 +153,7 @@ const Homepage = () => {
             onPageChange={setCurrentPage}
           />
         </main>
+        <Banner />
       </div>
 
       <Footer />
@@ -163,6 +166,7 @@ const Homepage = () => {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
       />
+      <FloatingContactButtons />
     </div>
   );
 };
