@@ -121,7 +121,7 @@ const Homepage = () => {
             onPriceRangeChange={setPriceRange}
             sortBy={sortBy}
             onSortChange={setSortBy}
-            totalProducts={products.length}
+            totalProducts={allProducts.length}
           />
 
           {products.length > 0 ? (

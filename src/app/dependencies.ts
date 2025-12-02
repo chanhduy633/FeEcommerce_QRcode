@@ -80,6 +80,7 @@ import { OrderRepository } from "../data/repositories/orderRepository";
 import { GetOrdersUseCase } from "../domain/usecases/order/getOrdersUseCase";
 import { UpdateOrderStatusUseCase } from "../domain/usecases/order/updateOrderStatusUseCase";
 import { GetOrderDetailUseCase } from "../domain/usecases/order/getOrderDetailUseCase";
+import { DeleteOrderUseCase } from "../domain/usecases/order/deleteOrderUseCase";
 
 const orderRemote = new OrderRemote();
 const orderRepository = new OrderRepository(orderRemote);
@@ -88,4 +89,5 @@ export const orderDependencies = {
   getOrders: new GetOrdersUseCase(orderRepository),
   updateStatus: new UpdateOrderStatusUseCase(orderRepository),
   getDetail: new GetOrderDetailUseCase(orderRepository),
+  deleteOrder: new DeleteOrderUseCase(orderRepository),
 };

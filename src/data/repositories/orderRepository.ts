@@ -21,4 +21,7 @@ export class OrderRepository {
   async getOrderById(orderId: string) {
     return await this.remote.getById(orderId);
   }
+  async deleteOrder(orderId: string) {
+    return await this.remote.deleteOrder(orderId);
+  }
 }

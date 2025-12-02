@@ -1,8 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Eye, X, Package, CreditCard, User } from "lucide-react";
+import {
+  Eye,
+  X,
+  Package,
+  CreditCard,
+  User,
+  Trash2,
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { Order } from "../../../../types/Order";
 import { useOrderViewModel } from "../../../viewmodels/useOrderViewModel";
+import Pagination from "./Pagination";
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: "Chờ xử lý", color: "bg-yellow-100 text-yellow-800" },
@@ -15,7 +27,6 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 const paymentLabels: Record<string, string> = {
   COD: "Trả sau",
   BANK_TRANSFER: "Đã thanh toán",
-  SEPAY: "SePay",
 };
 
 function formatCurrency(amount: number) {
@@ -34,6 +45,20 @@ export default function OrderManagement() {
     fetchOrders,
     getOrderDetail,
     updateOrderStatus,
+    deleteOrder,
+    // Filter & Sort
+    searchTerm,
+    setSearchTerm,
+    statusFilter,
+    setStatusFilter,
+    paymentFilter,
+    setPaymentFilter,
+    sortBy,
+    setSortBy,
+    // Pagination
+    totalPages,
+    currentPage,
+    setCurrentPage,
   } = viewModel;
 
   const [showModal, setShowModal] = useState(false);
@@ -53,6 +78,19 @@ export default function OrderManagement() {
     }
   };
 
+  const handleDelete = async (orderId: string, orderNumber: string) => {
+    if (!window.confirm(`Bạn có chắc muốn xóa đơn hàng ${orderNumber}?`)) {
+      return;
+    }
+
+    try {
+      await deleteOrder(orderId);
+      toast.success("Xóa đơn hàng thành công!");
+    } catch (err: any) {
+      toast.error(err.message || "Xóa đơn hàng thất bại");
+    }
+  };
+
   if (loading)
     return (
       <div className="flex h-screen items-center justify-center text-gray-500">
@@ -68,9 +106,70 @@ export default function OrderManagement() {
     );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-2xl font-semibold text-gray-800">Quản lý đơn hàng</h1>
 
+      {/* Controls Section */}
+      <div className="bg-white p-4 rounded-xl shadow flex flex-col md:flex-row gap-4">
+        {/* Search */}
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo mã đơn hàng..."
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <Filter className="text-gray-500 w-4 h-4" />
+            <select
+              className="border rounded-lg px-3 py-2 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">Tất cả trạng thái</option>
+              {Object.entries(statusConfig).map(([key, { label }]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <select
+            className="border rounded-lg px-3 py-2 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            value={paymentFilter}
+            onChange={(e) => setPaymentFilter(e.target.value)}
+          >
+            <option value="all">Tất cả phương thức</option>
+            {Object.entries(paymentLabels).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="border rounded-lg px-3 py-2 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="date-desc">Mới nhất trước</option>
+            <option value="date-asc">Cũ nhất trước</option>
+            <option value="amount-desc">Giá cao nhất trước</option>
+            <option value="amount-asc">Giá thấp nhất trước</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Orders Table */}
       <div className="bg-white shadow rounded-xl overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -94,9 +193,8 @@ export default function OrderManagement() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {orders.map((o) => {
-             
-              return (
+            {orders.length > 0 ? (
+              orders.map((o) => (
                 <tr key={o._id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-800">
                     {o.orderNumber}
@@ -127,8 +225,15 @@ export default function OrderManagement() {
                   </td>
                   <td className="px-4 py-3 text-right flex items-center gap-2 justify-end">
                     <button
+                      onClick={() => handleDelete(o._id, o.orderNumber)}
+                      className="text-red-600 hover:text-red-800 cursor-pointer"
+                      title="Xóa đơn hàng"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                    <button
                       onClick={() => openDetail(o)}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-blue-600 hover:text-blue-800 cursor-pointer"
                       title="Xem chi tiết"
                     >
                       <Eye className="w-5 h-5" />
@@ -147,16 +252,23 @@ export default function OrderManagement() {
                     </select>
                   </td>
                 </tr>
-              );
-            })}
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  Không có đơn hàng nào phù hợp.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
-        {orders.length === 0 && (
-          <div className="p-6 text-center text-gray-500">
-            Không có đơn hàng nào.
-          </div>
-        )}
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       {/* Modal chi tiết */}
       {showModal && selectedOrder && (
@@ -170,7 +282,7 @@ export default function OrderManagement() {
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-600 hover:text-gray-800"
+                className="text-gray-600 hover:text-gray-800 cursor-pointer"
               >
                 <X size={22} />
               </button>
@@ -304,7 +416,7 @@ export default function OrderManagement() {
             <div className="border-t px-6 py-4 flex justify-end">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-5 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                className="px-5 py-2 cursor-pointer bg-gray-600 text-white rounded-lg hover:bg-gray-700"
               >
                 Đóng
               </button>

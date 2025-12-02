@@ -14,15 +14,26 @@ export const useProductManagementViewModel = () => {
   const [editingProduct, setEditingProduct] = useState<IProduct | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<IProduct | null>(null);
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  // ====== LOAD PRODUCTS ======
+  const fetchProducts = async () => {
+    setLoading(true);
+    await vm.loadProducts();   // lấy toàn bộ, giống homepage
+    setProducts(vm.products);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      await vm.loadProducts();
-      setProducts(vm.products);
-      setLoading(false);
-    };
     fetchProducts();
   }, []);
+
+  // Reset về trang 1 khi search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   // ====== FILTER ======
   const filteredProducts = useMemo(() => {
@@ -32,6 +43,14 @@ export const useProductManagementViewModel = () => {
         p.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [products, searchTerm]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = currentPage * itemsPerPage;
+    return filteredProducts.slice(start, end);
+  }, [filteredProducts, currentPage]);
 
   // ====== HANDLERS ======
   const handleAdd = () => {
@@ -45,32 +64,47 @@ export const useProductManagementViewModel = () => {
   };
 
   const handleSave = async (formData: IProduct) => {
-    if (editingProduct) await vm.updateProduct(editingProduct.id, formData);
-    else await vm.addProduct(formData);
+    if (editingProduct) {
+      await vm.updateProduct(editingProduct.id, formData);
+    } else {
+      await vm.addProduct(formData);
+    }
+
     setIsDialogOpen(false);
-    await vm.loadProducts();
-    setProducts(vm.products);
+    await fetchProducts();
   };
 
   const handleDelete = async (id: string) => {
     await vm.deleteProduct(id);
-    await vm.loadProducts();
-    setProducts(vm.products);
+    await fetchProducts();
     setDeleteConfirm(null);
   };
 
-  // ====== EXPORT ======
   return {
     loading,
-    products: filteredProducts,
+    products: paginatedProducts,
+    allProducts: products,
+
+    // Search
     searchTerm,
     setSearchTerm,
+
+    // Pagination
+    currentPage,
+    setCurrentPage,
+    totalPages,
+
+    // Dialog
     isDialogOpen,
     setIsDialogOpen,
+
     editingProduct,
     setEditingProduct,
+
     deleteConfirm,
     setDeleteConfirm,
+
+    // Methods
     handleAdd,
     handleEdit,
     handleSave,

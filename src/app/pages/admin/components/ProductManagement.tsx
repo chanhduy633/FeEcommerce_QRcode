@@ -1,6 +1,7 @@
 import React from "react";
 import { Plus, Search } from "lucide-react";
 import ProductTable from "./ProductTable";
+import Pagination from "./Pagination";
 import ProductForm from "./ProductForm";
 import DeleteDialog from "./DeleteDialog";
 import { useProductManagementViewModel } from "../hooks/useProductManagementViewModel";
@@ -21,9 +22,13 @@ const ProductManagement: React.FC = () => {
     handleEdit,
     handleSave,
     handleDelete,
+    currentPage,
+    totalPages,
+    setCurrentPage,
   } = useProductManagementViewModel();
 
-  if (loading) return <div className="text-center py-10">Đang tải sản phẩm...</div>;
+  if (loading)
+    return <div className="text-center py-10">Đang tải sản phẩm...</div>;
 
   return (
     <div className="space-y-6">
@@ -39,7 +44,10 @@ const ProductManagement: React.FC = () => {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+        <Search
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          size={20}
+        />
         <input
           type="text"
           placeholder="Tìm kiếm sản phẩm..."
@@ -49,10 +57,14 @@ const ProductManagement: React.FC = () => {
         />
       </div>
 
-      <ProductTable products={products} onEdit={handleEdit} onDelete={setDeleteConfirm} />
+      <ProductTable
+        products={products}
+        onEdit={handleEdit}
+        onDelete={setDeleteConfirm}
+      />
 
       {isDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+        <div className="fixed inset-0 bg-transparent bg-opacity-50 flex justify-center items-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
             <h3 className="text-lg font-semibold mb-4">
               {editingProduct ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
@@ -61,12 +73,16 @@ const ProductManagement: React.FC = () => {
               product={editingProduct}
               onSave={handleSave}
               onCancel={() => setIsDialogOpen(false)}
-              uploadImageUseCase={uploadDependencies.uploadImage} 
+              uploadImageUseCase={uploadDependencies.uploadImage}
             />
           </div>
         </div>
       )}
-
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
       <DeleteDialog
         product={deleteConfirm}
         onConfirm={(id) => handleDelete(id)}

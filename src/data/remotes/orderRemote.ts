@@ -38,4 +38,18 @@ export class OrderRemote {
     if (!response.ok) throw new Error(data.message || "Lỗi khi tạo đơn hàng");
     return data;
   }
+  
+  async deleteOrder(orderId: string): Promise<any> {
+  const res = await fetch(`${API_ROUTES.ORDER}/${orderId}`, {
+    method: "DELETE",
+  });
+  
+  const data = await res.json();
+  
+  if (!res.ok) {
+    throw new Error(data.message || "Không thể xóa đơn hàng");
+  }
+  
+  return data.data;
+}
 }

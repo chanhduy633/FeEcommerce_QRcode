@@ -119,7 +119,6 @@ export const useProductDetailViewModel = (productId: string) => {
       await handleAddToCart(userId, product, quantity);
       await fetchCart(userId);
       setQuantity(1);
-      toast.success(`Đã thêm ${product.name} vào giỏ hàng!`);
     } catch (error) {
       console.error("❌ Error adding to cart:", error);
       toast.error("Không thể thêm sản phẩm vào giỏ hàng!");
@@ -140,7 +139,6 @@ export const useProductDetailViewModel = (productId: string) => {
       await fetchCart(userId);
       setQuantity(1);
       onOpenCart();
-      toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
     } catch (error) {
       console.error("Error buying now:", error);
       toast.error("Không thể mua sản phẩm này!");
