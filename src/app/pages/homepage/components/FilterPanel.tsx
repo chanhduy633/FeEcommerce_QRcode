@@ -148,9 +148,9 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
         <div className="flex-1"></div>
 
         {/* Số sản phẩm */}
-        <span className="text-sm text-gray-600">
+        {/* <span className="text-sm text-gray-600">
           {formatNumberWithSpaces(totalProducts)} sản phẩm
-        </span>
+        </span> */}
 
         {/* Sắp xếp */}
         <select

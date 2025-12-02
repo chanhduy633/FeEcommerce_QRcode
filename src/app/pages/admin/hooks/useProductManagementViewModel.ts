@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import type { IProduct } from "../../../../types/Product";
 import { AdminProductViewModel } from "../../../viewmodels/adminProductViewModel";
+import { toast } from "sonner";
 
 export const useProductManagementViewModel = () => {
   const vmRef = useRef(new AdminProductViewModel());
@@ -64,20 +65,36 @@ export const useProductManagementViewModel = () => {
   };
 
   const handleSave = async (formData: IProduct) => {
-    if (editingProduct) {
-      await vm.updateProduct(editingProduct.id, formData);
-    } else {
-      await vm.addProduct(formData);
-    }
+    try {
+      if (editingProduct) {
+        await vm.updateProduct(editingProduct.id, formData);
+        toast.success("Cập nhật sản phẩm thành công");
+        console.log("Updated product:", formData);
+      } else {
+        await vm.addProduct(formData);
+        toast.success("Thêm sản phẩm mới thành công");
+      }
 
-    setIsDialogOpen(false);
-    await fetchProducts();
+      setIsDialogOpen(false);
+      await vm.loadProducts();
+      setProducts(vm.products);
+    } catch (err) {
+      toast.error("Lưu sản phẩm thất bại");
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await vm.deleteProduct(id);
-    await fetchProducts();
-    setDeleteConfirm(null);
+    try {
+      await vm.deleteProduct(id);
+      toast.success("Xóa sản phẩm thành công");
+
+      await vm.loadProducts();
+      setProducts(vm.products);
+    } catch (err) {
+      toast.error("Không thể xóa sản phẩm");
+    } finally {
+      setDeleteConfirm(null);
+    }
   };
 
   return {
