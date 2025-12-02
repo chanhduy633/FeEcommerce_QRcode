@@ -43,15 +43,15 @@ const DashboardAdmin: React.FC = () => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center space-x-2 focus:outline-none cursor-pointer"
               >
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-semibold">
                   A
                 </div>
-                <ChevronDown
+                {/* <ChevronDown
                   size={18}
                   className={`transition-transform ${
                     isDropdownOpen ? "rotate-180" : ""
                   }`}
-                />
+                /> */}
               </button>
 
               {isDropdownOpen && (

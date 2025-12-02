@@ -7,8 +7,8 @@ import { useProductManagementViewModel } from '../hooks/useProductManagementView
 // import { productService } from '../services/productService';
 
 const Dashboard: React.FC = () => {
-  const { orders, fetchOrders } = useOrderViewModel();
-  const { products, loading: loadingProducts } = useProductManagementViewModel();
+  const { allOrders, fetchOrders } = useOrderViewModel();
+  const { allProducts, loading: loadingProducts } = useProductManagementViewModel();
 
   const [stats, setStats] = useState({
     totalProducts: 0,
@@ -24,36 +24,36 @@ const Dashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (orders.length > 0 || products.length > 0) {
+    if (allOrders.length > 0 || allProducts.length > 0) {
       calculateStats();
     }
-  }, [orders, products]);
+  }, [allOrders, allProducts]);
 
   const calculateStats = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const todayOrders = orders.filter((order) => {
+    const todayOrders = allOrders.filter((order) => {
       const orderDate = new Date(order.createdAt);
       orderDate.setHours(0, 0, 0, 0);
       return orderDate.getTime() === today.getTime();
     }).length;
 
-    const totalRevenue = orders
+    const totalRevenue = allOrders
       .filter((order) => order.status === "delivered" || order.status === "confirmed")
       .reduce((sum, order) => sum + order.totalAmount, 0);
 
     const totalCustomers = new Set(
-      orders
+      allOrders
         .filter((order) => order.shippingAddress?.phone)
-        .map((order) => order.shippingAddress.phone)
+        .map((order) => order.shippingAddress?.phone)
     ).size;
 
-    const pendingOrders = orders.filter((order) => order.status === "pending").length;
-    const deliveredOrders = orders.filter((order) => order.status === "delivered").length;
+    const pendingOrders = allOrders.filter((order) => order.status === "pending").length;
+    const deliveredOrders = allOrders.filter((order) => order.status === "delivered").length;
 
     setStats({
-      totalProducts: products.length, // ✅ lấy từ hook sản phẩm
+      totalProducts: allProducts.length,
       todayOrders,
       totalRevenue,
       totalCustomers,
@@ -110,19 +110,19 @@ const Dashboard: React.FC = () => {
     {
       label: 'Chờ xử lý',
       value: stats.pendingOrders,
-      total: orders.length,
-      color: 'bg-yellow-100 text-yellow-800'
+      total: allOrders.length,
+      color: 'bg-yellow-200 text-yellow-800'
     },
     {
       label: 'Đã giao',
       value: stats.deliveredOrders,
-      total: orders.length,
+      total: allOrders.length,
       color: 'bg-green-100 text-green-800'
     },
     {
       label: 'Tổng đơn hàng',
-      value: orders.length,
-      total: orders.length,
+      value: allOrders.length,
+      total: allOrders.length,
       color: 'bg-blue-100 text-blue-800'
     }
   ];
@@ -130,11 +130,8 @@ const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <TrendingUp size={16} />
-          <span>Cập nhật realtime</span>
-        </div>
+        <h2 className="text-2xl font-bold text-gray-800">Thống kê</h2>
+        
       </div>
 
       {/* Main Stats */}
@@ -186,7 +183,7 @@ const Dashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Đơn hàng gần đây</h3>
         <div className="space-y-3">
-          {orders.slice(0, 5).map((order, idx) => (
+          {allOrders.slice(0, 5).map((order, idx) => (
             <div key={idx} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -208,7 +205,7 @@ const Dashboard: React.FC = () => {
             </div>
           ))}
         </div>
-        {orders.length === 0 && (
+        {allOrders.length === 0 && (
           <p className="text-center text-gray-500 py-4">Chưa có đơn hàng nào</p>
         )}
       </div>

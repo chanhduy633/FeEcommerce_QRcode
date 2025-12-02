@@ -36,7 +36,7 @@ const ProductManagement: React.FC = () => {
         <h2 className="text-2xl font-bold text-gray-800">Quản lý Sản phẩm</h2>
         <button
           onClick={handleAdd}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition"
+          className="flex items-center space-x-2 px-4 py-2 bg-black/80 text-white rounded-lg hover:bg-black/65 cursor-pointer transition"
         >
           <Plus size={20} />
           <span>Thêm sản phẩm</span>

@@ -32,11 +32,11 @@ const Sidebar: React.FC<SidebarProps> = ({
       
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out ${
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white text-black transform transition-transform duration-300 ease-in-out ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="flex items-center justify-between p-6 border-b border-slate-700">
+        <div className="flex items-center justify-between p-6 ">
           <h1 className="text-xl font-bold">Admin Panel</h1>
           <button
             onClick={() => setIsMobileOpen(false)}
@@ -57,8 +57,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 }}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition-colors cursor-pointer ${
                   activeTab === item.id
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-slate-800'
+                    ? 'bg-black/80 text-white'
+                    : 'text-gray-500 hover:bg-black/20'
                 }`}
               >
                 <Icon size={20} />

@@ -248,7 +248,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         <button
           onClick={handleSubmit}
           disabled={isUploading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50"
+          className="px-4 py-2 bg-black/80 text-white rounded-lg hover:bg-black/65 transition-colors cursor-pointer disabled:opacity-50"
         >
           {isUploading ? "Đang xử lý..." : product ? "Cập nhật" : "Thêm mới"}
         </button>
