@@ -14,7 +14,7 @@ export const useProductManagementViewModel = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<IProduct | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<IProduct | null>(null);
-
+  const [categories, setCategories] = useState([]);
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -22,13 +22,26 @@ export const useProductManagementViewModel = () => {
   // ====== LOAD PRODUCTS ======
   const fetchProducts = async () => {
     setLoading(true);
-    await vm.loadProducts();   // lấy toàn bộ, giống homepage
+    await vm.loadProducts(); // lấy toàn bộ, giống homepage
     setProducts(vm.products);
     setLoading(false);
   };
 
+  const fetchCategories = async () => {
+    const res = await fetch("http://localhost:5317/api/categories");
+    const data = await res.json();
+
+    console.log("Categories API:", data);
+
+    // Lấy danh sách categories đúng cấu trúc
+    const list = Array.isArray(data.data) ? data.data : [];
+
+    setCategories(list);
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   // Reset về trang 1 khi search
@@ -101,7 +114,7 @@ export const useProductManagementViewModel = () => {
     loading,
     products: paginatedProducts,
     allProducts: products,
-
+    categories,
     // Search
     searchTerm,
     setSearchTerm,

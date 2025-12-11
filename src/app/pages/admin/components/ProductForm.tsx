@@ -8,6 +8,7 @@ interface ProductFormProps {
   onSave: (formData: IProduct) => void;
   onCancel: () => void;
   uploadImageUseCase: UploadImageUseCase; // DI UseCase
+  categories: { _id: string; name: string }[];
 }
 
 type ProductFormData = Omit<IProduct, "price" | "stock" | "sold"> & {
@@ -21,6 +22,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onSave,
   onCancel,
   uploadImageUseCase,
+  categories,
 }) => {
   const [formData, setFormData] = useState<ProductFormData>(
     product || {
@@ -56,7 +58,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
     reader.readAsDataURL(file);
   };
 
-  
   const handleSubmit = async () => {
     if (
       !formData.name ||
@@ -69,7 +70,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
 
     setIsUploading(true);
-    
+
     try {
       let imageUrl = formData.image_url;
 
@@ -171,10 +172,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
           >
             <option value="">Chọn danh mục</option>
-            <option value="Điện thoại">Điện thoại</option>
-            <option value="Laptop">Laptop</option>
-            <option value="Phụ kiện">Phụ kiện</option>
-            <option value="Tablet">Tablet</option>
+
+            {categories.map((c) => (
+              <option key={c._id} value={c.name}>
+                {c.name}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -218,8 +221,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           className="hidden"
         />
       </div>
-
-      {/* Mô tả */}
 
       {/* Mô tả */}
       <div>

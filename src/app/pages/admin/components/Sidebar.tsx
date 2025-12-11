@@ -17,6 +17,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'products', label: 'Quản lý Sản phẩm', icon: Package },
+    { id: 'categories', label: 'Quản lý Kho hàng', icon: Package },
     { id: 'orders', label: 'Quản lý Đơn hàng', icon: Package },
   ];
 

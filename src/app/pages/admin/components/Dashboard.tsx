@@ -245,8 +245,10 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">Thống kê</h2>
+      <div className="mb-6">
+        <p className="text-gray-600">
+          Bảng điều khiển tổng quan về hiệu suất cửa hàng của bạn
+        </p>
       </div>
 
       {/* Main Stats */}

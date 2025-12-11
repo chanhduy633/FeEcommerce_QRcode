@@ -1,10 +1,11 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5317";
-const VERSION = "v1";
+const VERSION = "v2";
 export const API_ROUTES = {
   UPLOAD: `${API_BASE_URL}/api/upload`,
   ORDER: `${API_BASE_URL}/api/orders`,
   PRODUCTS: `${API_BASE_URL}/api/${VERSION}/products`,
+  CATEGORIES: `${API_BASE_URL}/api/categories`,
   LOGIN_ADMIN: `${API_BASE_URL}/api/auth/admin/login`,
   LOGIN_USER: `${API_BASE_URL}/api/auth/user/login`,
   USERS: (userId: string) => `${API_BASE_URL}/api/users/${userId}`,

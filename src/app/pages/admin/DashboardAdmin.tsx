@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Menu, LogOut, ChevronDown  } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import Dashboard from "./components/Dashboard";
 import ProductManagement from "./components/ProductManagement";
 import Sidebar from "./components/Sidebar";
 import { useNavigate } from "react-router-dom";
 import OrderManagement from "./components/OrderManagement";
+import CategoryManagement from "./components/CategoryManagement";
 
 const DashboardAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -13,8 +14,8 @@ const DashboardAdmin: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('user'); // hoặc remove token nếu bạn dùng token
-    navigate('/login'); // chuyển về trang login
+    localStorage.removeItem("user"); // hoặc remove token nếu bạn dùng token
+    navigate("/login"); // chuyển về trang login
   };
   return (
     <div className="flex h-screen bg-gray-100">
@@ -36,7 +37,12 @@ const DashboardAdmin: React.FC = () => {
               <Menu size={24} />
             </button>
             <h1 className="text-xl font-semibold text-gray-800">
-              {activeTab === "dashboard" ? "Dashboard" : "Quản lý Sản phẩm"}
+              {{
+                dashboard: "Tổng quan",
+                products: "Quản lý Sản phẩm",
+                categories: "Quản lý Danh mục",
+                orders: "Quản lý Đơn hàng",
+              }[activeTab] || "Admin Dashboard"}
             </h1>
             <div className="relative">
               <button
@@ -73,6 +79,7 @@ const DashboardAdmin: React.FC = () => {
         <main className="flex-1 overflow-y-auto p-6">
           {activeTab === "dashboard" && <Dashboard />}
           {activeTab === "products" && <ProductManagement />}
+          {activeTab === "categories" && <CategoryManagement />}
           {activeTab === "orders" && <OrderManagement />}
         </main>
       </div>

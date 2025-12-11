@@ -11,6 +11,7 @@ const ProductManagement: React.FC = () => {
   const {
     loading,
     products,
+    categories,
     searchTerm,
     setSearchTerm,
     isDialogOpen,
@@ -33,7 +34,11 @@ const ProductManagement: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Quản lý Sản phẩm</h2>
+        <div>
+          <p className="text-gray-600">
+            Quản lý sản phẩm và tải lên sản phẩm mới
+          </p>
+        </div>
         <button
           onClick={handleAdd}
           className="flex items-center space-x-2 px-4 py-2 bg-black/80 text-white rounded-lg hover:bg-black/65 cursor-pointer transition"
@@ -74,6 +79,7 @@ const ProductManagement: React.FC = () => {
               onSave={handleSave}
               onCancel={() => setIsDialogOpen(false)}
               uploadImageUseCase={uploadDependencies.uploadImage}
+              categories={categories}
             />
           </div>
         </div>
