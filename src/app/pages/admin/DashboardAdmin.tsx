@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar";
 import { useNavigate } from "react-router-dom";
 import OrderManagement from "./components/OrderManagement";
 import CategoryManagement from "./components/CategoryManagement";
+import SpecificationManagement from "./components/SpecificationManagement";
 
 const DashboardAdmin: React.FC = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -40,6 +41,7 @@ const DashboardAdmin: React.FC = () => {
               {{
                 dashboard: "Tổng quan",
                 products: "Quản lý Sản phẩm",
+                specification: "Quản lý Thông số",
                 categories: "Quản lý Danh mục",
                 orders: "Quản lý Đơn hàng",
               }[activeTab] || "Admin Dashboard"}
@@ -79,6 +81,7 @@ const DashboardAdmin: React.FC = () => {
         <main className="flex-1 overflow-y-auto p-6">
           {activeTab === "dashboard" && <Dashboard />}
           {activeTab === "products" && <ProductManagement />}
+          {activeTab === "specification" && <SpecificationManagement />}
           {activeTab === "categories" && <CategoryManagement />}
           {activeTab === "orders" && <OrderManagement />}
         </main>

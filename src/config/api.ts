@@ -5,6 +5,7 @@ export const API_ROUTES = {
   UPLOAD: `${API_BASE_URL}/api/upload`,
   ORDER: `${API_BASE_URL}/api/orders`,
   PRODUCTS: `${API_BASE_URL}/api/${VERSION}/products`,
+  SPECIFICATION: `${API_BASE_URL}/api/specifications`,
   CATEGORIES: `${API_BASE_URL}/api/categories`,
   LOGIN_ADMIN: `${API_BASE_URL}/api/auth/admin/login`,
   LOGIN_USER: `${API_BASE_URL}/api/auth/user/login`,
