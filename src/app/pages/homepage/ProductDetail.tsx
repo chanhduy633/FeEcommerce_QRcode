@@ -31,6 +31,7 @@ const ProductDetail = () => {
   // ====== USE VIEW MODEL ======
   const {
     product,
+    specification,
     loading,
     error,
     images,
@@ -101,6 +102,23 @@ const ProductDetail = () => {
   // ====== UTILS ======
   const formatPrice = (price: number) =>
     price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+  // Định nghĩa các trường specification
+  const specificationFields = [
+    { key: "brand", label: "Thương hiệu" },
+    { key: "model", label: "Model" },
+    { key: "releaseYear", label: "Năm ra mắt" },
+    { key: "warranty", label: "Bảo hành" },
+    { key: "origin", label: "Xuất xứ" },
+    { key: "color", label: "Màu sắc" },
+    { key: "material", label: "Chất liệu" },
+  ];
+
+  // Lọc các trường có giá trị
+  const availableSpecs = specification
+    ? specificationFields.filter(
+        (field) => specification[field.key as keyof typeof specification]
+      )
+    : [];
 
   // ====== LOADING STATE ======
   if (loading) {
@@ -350,50 +368,35 @@ const ProductDetail = () => {
         </div>
 
         {/* Technical Specifications */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-12">
-          <h3 className="font-bold text-gray-900 mb-4 text-lg">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Thông số kỹ thuật
-          </h3>
-          <table className="w-full text-sm text-gray-700 border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            <tbody>
-              <tr className="border-b border-gray-200 hover:bg-gray-50 transition">
-                <td className="px-4 py-3 font-semibold bg-gray-50 w-1/3 text-gray-800">
-                  Kích thước
-                </td>
-                <td className="px-4 py-3 bg-white">20 x 15 x 10 cm</td>
-              </tr>
-              <tr className="border-b border-gray-200 hover:bg-gray-50 transition">
-                <td className="px-4 py-3 font-semibold bg-gray-50 text-gray-800">
-                  Trọng lượng
-                </td>
-                <td className="px-4 py-3 bg-white">500g</td>
-              </tr>
-              <tr className="border-b border-gray-200 hover:bg-gray-50 transition">
-                <td className="px-4 py-3 font-semibold bg-gray-50 text-gray-800">
-                  Chất liệu
-                </td>
-                <td className="px-4 py-3 bg-white">Nhựa ABS + Kim loại</td>
-              </tr>
-              <tr className="border-b border-gray-200 hover:bg-gray-50 transition">
-                <td className="px-4 py-3 font-semibold bg-gray-50 text-gray-800">
-                  Màu sắc
-                </td>
-                <td className="px-4 py-3 bg-white">Đen / Trắng / Xám</td>
-              </tr>
-              <tr className="border-b border-gray-200 hover:bg-gray-50 transition">
-                <td className="px-4 py-3 font-semibold bg-gray-50 text-gray-800">
-                  Dung lượng
-                </td>
-                <td className="px-4 py-3 bg-white">64GB</td>
-              </tr>
-              <tr className="hover:bg-gray-50 transition">
-                <td className="px-4 py-3 font-semibold bg-gray-50 text-gray-800">
-                  Bảo hành
-                </td>
-                <td className="px-4 py-3 bg-white">12 tháng</td>
-              </tr>
-            </tbody>
-          </table>
+          </h2>
+
+          {availableSpecs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {availableSpecs.map((field) => (
+                <div
+                  key={field.key}
+                  className="flex border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 transition"
+                >
+                  <div className="bg-gray-50 px-4 py-3 font-semibold text-gray-700 w-2/5 flex items-center">
+                    {field.label}
+                  </div>
+                  <div className="px-4 py-3 text-gray-900 w-3/5 flex items-center">
+                    {specification![field.key as keyof typeof specification]}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Package size={48} className="text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500">
+                Chưa có thông số kỹ thuật cho sản phẩm này
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Related Products */}

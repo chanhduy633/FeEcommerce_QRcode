@@ -3,11 +3,13 @@ import { toast } from "sonner";
 import type { IProduct } from "../../types/Product";
 import { useHomepageViewModel } from "./homepageViewModel";
 import { dependencies } from "../dependencies";
+import getSpecificationUsecase from "../../domain/usecases/specification/getSpecificationUsecase";
+import type { ISpecification } from "../../types/Specification";
 
 export const useProductDetailViewModel = (productId: string) => {
   // ====== DEPENDENCIES ======
   const { getProductByIdUseCase } = dependencies;
-  
+
   // ====== SHARED LOGIC FROM HOMEPAGE ======
   const {
     cart,
@@ -25,6 +27,7 @@ export const useProductDetailViewModel = (productId: string) => {
 
   // ====== LOCAL STATE ======
   const [product, setProduct] = useState<IProduct | null>(null);
+  const [specification, setSpecification] = useState<ISpecification | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -35,18 +38,25 @@ export const useProductDetailViewModel = (productId: string) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // ====== FETCH PRODUCT ======
- const fetchProduct = async () => {
+  const fetchProduct = async () => {
     try {
       setLoading(true);
       const data = await getProductByIdUseCase.execute(productId);
-      
+      // Fetch specification
+      try {
+        const specData = await getSpecificationUsecase.execute(productId);
+        setSpecification(specData);
+      } catch (specError) {
+        console.log("No specification found for product:", productId);
+        setSpecification(null);
+      }
       // Normalize product data: map _id → id (handle both formats)
       const rawData = data as any;
       const normalizedProduct: IProduct = {
         ...data,
         id: rawData._id || data.id,
       };
-      
+
       console.log("📦 Fetched and normalized product:", normalizedProduct);
       setProduct(normalizedProduct);
       setError(null);
@@ -91,7 +101,9 @@ export const useProductDetailViewModel = (productId: string) => {
     if (!product) return false;
 
     const cartItems = cart?.items ?? [];
-    const existingItem = cartItems.find((item) => item.productId === product.id);
+    const existingItem = cartItems.find(
+      (item) => item.productId === product.id
+    );
     const currentQuantity = existingItem?.quantity ?? 0;
     const newTotal = currentQuantity + quantityToAdd;
 
@@ -158,8 +170,14 @@ export const useProductDetailViewModel = (productId: string) => {
     if (!product) return [];
 
     const keywords = [
-      ...product.name.toLowerCase().split(" ").filter((w) => w.length > 2),
-      ...(product.description?.toLowerCase().split(" ").filter((w) => w.length > 2) || []),
+      ...product.name
+        .toLowerCase()
+        .split(" ")
+        .filter((w) => w.length > 2),
+      ...(product.description
+        ?.toLowerCase()
+        .split(" ")
+        .filter((w) => w.length > 2) || []),
     ];
 
     const scoredProducts = allProducts
@@ -198,10 +216,11 @@ export const useProductDetailViewModel = (productId: string) => {
   return {
     // Product data
     product,
+    specification,
     loading,
     error,
     images,
-    
+
     // UI state
     quantity,
     selectedImage,
@@ -211,11 +230,11 @@ export const useProductDetailViewModel = (productId: string) => {
     loadingText,
     currentIndex,
     setCurrentIndex,
-    
+
     // Cart data
     cart,
     cartItemCount,
-    
+
     // Homepage shared
     allProducts,
     categories,
@@ -223,10 +242,10 @@ export const useProductDetailViewModel = (productId: string) => {
     setSelectedCategory,
     searchTerm,
     setSearchTerm,
-    
+
     // Related products
     relatedProducts,
-    
+
     // Actions
     handleQuantityChange,
     handleAddToCartClick,
