@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Package,  X } from 'lucide-react';
+import { LayoutDashboard, Package,  ShoppingCart,  SlidersHorizontal,  Warehouse,  X } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
@@ -15,12 +15,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   setIsMobileOpen,
 }) => {
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'products', label: 'Quản lý Sản phẩm', icon: Package },
-    { id: 'specification', label: 'Quản lý Thông số', icon: Package },
-    { id: 'categories', label: 'Quản lý Kho hàng', icon: Package },
-    { id: 'orders', label: 'Quản lý Đơn hàng', icon: Package },
-  ];
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'products', label: 'Quản lý Sản phẩm', icon: Package },
+  { id: 'specification', label: 'Quản lý Thông số', icon: SlidersHorizontal },
+  { id: 'categories', label: 'Quản lý Kho hàng', icon: Warehouse },
+  { id: 'orders', label: 'Quản lý Đơn hàng', icon: ShoppingCart },
+];
 
   return (
     <>

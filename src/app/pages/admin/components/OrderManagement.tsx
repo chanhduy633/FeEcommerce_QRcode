@@ -107,7 +107,11 @@ export default function OrderManagement() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-800">Quản lý đơn hàng</h1>
+      <div>
+      <p className=" text-gray-800">Quản lý đơn hàng</p>
+      <p className=" text-red-500">*Đơn hàng đã hủy không thể cập nhật trạng thái*</p>
+
+      </div>
 
       {/* Controls Section */}
       <div className="bg-white p-4 rounded-xl shadow flex flex-col md:flex-row gap-4">

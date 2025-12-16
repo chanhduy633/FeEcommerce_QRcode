@@ -22,11 +22,11 @@ const SpecificationManagement = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <p className=" text-gray-900 mb-6">
           Quản lý Thông số Kỹ thuật Sản phẩm
-        </h1>
+        </p>
 
         <div className="grid grid-cols-12 gap-6">
           {/* Danh sách sản phẩm */}

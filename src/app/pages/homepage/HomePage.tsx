@@ -15,6 +15,7 @@ import type { IProduct } from "../../../types/Product";
 import { useNavigate } from "react-router";
 import FloatingContactButtons from "./components/FloatingContactButtons";
 import Banner from "./components/Bannner";
+import AIChatbox from "./components/AIChatbox";
 
 const Homepage = () => {
   const [user, setUser] = useState<any>(null);
@@ -167,6 +168,8 @@ const Homepage = () => {
         onRemoveItem={handleRemoveItem}
       />
       <FloatingContactButtons />
+      <AIChatbox />
+      
     </div>
   );
 };

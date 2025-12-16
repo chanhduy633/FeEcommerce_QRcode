@@ -7,6 +7,7 @@ export const API_ROUTES = {
   PRODUCTS: `${API_BASE_URL}/api/${VERSION}/products`,
   SPECIFICATION: `${API_BASE_URL}/api/specifications`,
   CATEGORIES: `${API_BASE_URL}/api/categories`,
+  CHAT: `${API_BASE_URL}/api/chat`,
   LOGIN_ADMIN: `${API_BASE_URL}/api/auth/admin/login`,
   LOGIN_USER: `${API_BASE_URL}/api/auth/user/login`,
   USERS: (userId: string) => `${API_BASE_URL}/api/users/${userId}`,
