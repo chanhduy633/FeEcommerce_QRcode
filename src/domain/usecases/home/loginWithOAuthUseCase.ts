@@ -1,4 +1,4 @@
-import type { IUserRepository } from "../../../data/repositories/UserRepository";
+import type { IUserRepository } from "../../../data/repositories/userRepository";
 
 export class LoginWithOAuthUseCase {
   private userRepo: IUserRepository; // khai báo field riêng
