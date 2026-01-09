@@ -1,6 +1,5 @@
 import { Shield, TrendingUp, Truck, Zap } from "lucide-react";
 
-import React from "react";
 
 const TrustBadges = () => {
   return (

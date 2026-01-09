@@ -18,7 +18,6 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   onPriceRangeChange,
   sortBy,
   onSortChange,
-  totalProducts,
 }) => {
   // Hàm format số thành dạng có khoảng trắng: 10000000 → 10 000 000
   const formatNumberWithSpaces = (num: number): string => {

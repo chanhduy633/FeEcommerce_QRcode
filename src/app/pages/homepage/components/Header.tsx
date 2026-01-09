@@ -51,7 +51,6 @@ const Header: React.FC<HeaderProps> = ({
   const searchRef = useRef<HTMLDivElement>(null); // ✅ THÊM
   const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
-    // ✅ THÊM
     const handleClickOutside = (event: MouseEvent) => {
       if (
         searchRef.current &&
@@ -65,7 +64,7 @@ const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const handleSearchChange = (value: string) => {
-    setSearchTerm(value); // ✅ cập nhật local state
+    setSearchTerm(value);
     setShowSuggestions(value.length > 0);
     onSearchChange(value);
   };

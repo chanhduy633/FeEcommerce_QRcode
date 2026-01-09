@@ -29,7 +29,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   onLoginSuccess,
 }) => {
   const [mode, setMode] = useState<AuthMode>("login");
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // Form state

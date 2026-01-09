@@ -8,8 +8,6 @@ import {
   Trash2,
   Search,
   Filter,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Order } from "../../../../types/Order";

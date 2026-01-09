@@ -21,7 +21,7 @@ import { useProductManagementViewModel } from "../hooks/useProductManagementView
 
 const Dashboard: React.FC = () => {
   const { allOrders, fetchOrders } = useOrderViewModel();
-  const { allProducts, loading: loadingProducts } =
+  const { allProducts } =
     useProductManagementViewModel();
 
   const [stats, setStats] = useState({
@@ -126,7 +126,7 @@ const Dashboard: React.FC = () => {
     const chartData = Object.keys(monthlyData)
       .sort()
       .map((key) => {
-        const [year, month] = key.split("-");
+        const [ month] = key.split("-");
         const monthNames = [
           "T1",
           "T2",

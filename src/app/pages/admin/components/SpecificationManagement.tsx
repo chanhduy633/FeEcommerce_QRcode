@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Search, Save, Image } from "lucide-react";
 import { useSpecificationViewModel } from "../../../viewmodels/specificationViewmodel";
 

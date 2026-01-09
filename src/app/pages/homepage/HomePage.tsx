@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useHomepageViewModel } from "../../viewmodels/homepageViewModel";
 import Header from "./components/Header";
@@ -62,7 +62,7 @@ const Homepage = () => {
   }, []);
 
   const userId = user?._id || getGuestId();
-
+// Lỗi xử lý đăng nhập thành công
   const handleLoginSuccess = (userId: string, userData: any) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));

@@ -16,7 +16,7 @@ import { UploadRemote } from "../data/remotes/uploadRemote";
 import { UploadRepository } from "../data/repositories/uploadRepository";
 import { UploadImageUseCase } from "../domain/usecases/admin/uploadImageUseCase";
 import { LoginWithOAuthUseCase } from "../domain/usecases/home/loginWithOAuthUseCase";
-import { RemoteUserRepository } from "../data/repositories/UserRepository";
+import { RemoteUserRepository } from "../data/repositories/userRepository";
 import { AuthUserRemote } from "../data/remotes/authUserRemote";
 import { AuthUserRepository } from "../data/repositories/authUserRepository";
 import { AuthUserUseCase } from "../domain/usecases/home/authUserUseCase";

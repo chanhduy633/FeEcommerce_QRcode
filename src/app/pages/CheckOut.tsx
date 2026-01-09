@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle2, CreditCard, Loader2, Wallet } from "lucide-react";
+import { CheckCircle2, CreditCard, Wallet } from "lucide-react";
 import { useCheckoutViewModel } from "../viewmodels/checkoutViewModel";
 
 export default function CheckoutPage() {

@@ -1,5 +1,5 @@
 import type { OrderRepository } from "../../../data/repositories/orderRepository";
-import type { Order } from "../../../types/Order";
+import type { ApiResponse, Order } from "../../../types/Order";
 
 export class CreateOrderUseCase {
    private orderRepo: OrderRepository;
@@ -9,7 +9,7 @@ export class CreateOrderUseCase {
     }
   
 
-  async execute(order: Order): Promise<Order> {
+  async execute(order: Order): Promise<ApiResponse<Order>> {
     return await this.orderRepo.createOrder(order);
   }
 }

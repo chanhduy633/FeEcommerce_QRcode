@@ -1,5 +1,4 @@
 // src/pages/LoginAdmin.tsx
-import React from "react";
 import { dependencies } from "../../authDependencies";
 import { useAuthViewModel } from "../../viewmodels/authViewModel";
 import { Lock, User } from "lucide-react";

@@ -2,7 +2,7 @@ import React from "react";
 import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
 import type { CartItem } from "../../../../types/Cart";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom"; // 🟢 thêm dòng này
+import { useNavigate } from "react-router-dom";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -25,7 +25,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
   onUpdateQuantity,
   onRemoveItem,
 }) => {
-  const navigate = useNavigate(); // 🟢 khởi tạo điều hướng
+  const navigate = useNavigate(); 
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN", {
