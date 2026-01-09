@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import type { IProduct } from "../../../../types/Product";
 import { AdminProductViewModel } from "../../../viewmodels/adminProductViewModel";
 import { toast } from "sonner";
+import { API_ROUTES } from "../../../../config/api";
 
 export const useProductManagementViewModel = () => {
   const vmRef = useRef(new AdminProductViewModel());
@@ -28,7 +29,7 @@ export const useProductManagementViewModel = () => {
   };
 
   const fetchCategories = async () => {
-    const res = await fetch("http://localhost:5317/api/categories");
+    const res = await fetch(API_ROUTES.CATEGORIES);
     const data = await res.json();
 
     console.log("Categories API:", data);
