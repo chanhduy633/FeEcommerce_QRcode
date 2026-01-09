@@ -67,7 +67,7 @@ const Homepage = () => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
     toast.success("Đăng nhập thành công!");
-    fetchCart(userData._id);
+    fetchCart(userId);
   };
 
   const handleLogout = () => {

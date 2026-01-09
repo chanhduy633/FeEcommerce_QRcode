@@ -59,7 +59,7 @@ const ProductDetail = () => {
     handleUpdateQuantity,
     handleRemoveItem,
     fetchCart,
-  } = useProductDetailViewModel(productId);
+  } = useProductDetailViewModel(productId as string);
 
   // ====== USER MANAGEMENT ======
   useEffect(() => {

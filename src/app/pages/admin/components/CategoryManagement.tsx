@@ -235,7 +235,7 @@ const CategoryManagement = () => {
                   {vm.products.map((product) => {
                     const status = getStockStatus(product);
                     return (
-                      <tr key={product._id} className="hover:bg-gray-50">
+                      <tr key={product.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-normal break-words">
                           <div className="flex items-center">
                             <img
@@ -325,16 +325,17 @@ const StatCard = ({
     </div>
   </div>
 );
+type CategoryFormData = {
+  name: string;
+  description: string;
+  image: string;
+  isActive: boolean;
+};
 
 interface CategoryModalProps {
   mode: "add" | "edit";
-  formData: {
-    name: string;
-    description: string;
-    image: string;
-    isActive: boolean;
-  };
-  onChange: (data: Partial<typeof formData>) => void;
+  formData: CategoryFormData;
+  onChange: (data: Partial<CategoryFormData>) => void;
   onClose: () => void;
   onSubmit: () => Promise<void>;
 }

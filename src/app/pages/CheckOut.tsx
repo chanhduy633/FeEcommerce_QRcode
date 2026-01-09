@@ -1,4 +1,3 @@
-import React from "react";
 import { CheckCircle2, CreditCard, Wallet } from "lucide-react";
 import { useCheckoutViewModel } from "../viewmodels/checkoutViewModel";
 
