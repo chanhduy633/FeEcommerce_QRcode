@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Search, Save, Image } from "lucide-react";
 import { useSpecificationViewModel } from "../../../viewmodels/specificationViewmodel";
+import { getImageUrl } from "../../../../utils/imageHelper";
 
 const SpecificationManagement = () => {
   const {
@@ -59,7 +60,7 @@ const SpecificationManagement = () => {
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                       {product.image_url ? (
                         <img
-                          src={product.image_url}
+                          src={getImageUrl(product.image_url)}
                           alt={product.name}
                           className="w-full h-full object-cover"
                         />

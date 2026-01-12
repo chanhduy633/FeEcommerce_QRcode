@@ -21,6 +21,7 @@ import type { IProduct } from "../../../types/Product";
 import { useProductDetailViewModel } from "../../viewmodels/productDetailViewModel";
 import { useParams } from "react-router-dom";
 import FloatingContactButtons from "./components/FloatingContactButtons";
+import { getImageUrl } from "../../../utils/imageHelper";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
@@ -212,7 +213,7 @@ const ProductDetail = () => {
             <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4 relative group">
               {images.length > 0 ? (
                 <img
-                  src={images[selectedImage]}
+                  src={getImageUrl(images[selectedImage])}
                   alt={product.name}
                   className="w-full h-96 object-contain"
                 />
@@ -447,7 +448,7 @@ const ProductDetail = () => {
                       <div className="relative aspect-square overflow-hidden bg-gray-100">
                         {item.image_url ? (
                           <img
-                            src={item.image_url}
+                            src={getImageUrl(item.image_url)}
                             alt={item.name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           />

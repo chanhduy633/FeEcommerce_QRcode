@@ -2,7 +2,9 @@ import React from "react";
 import { ShoppingCart, X, Plus, Minus, Trash2 } from "lucide-react";
 import type { CartItem } from "../../../../types/Cart";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+
+import { useNavigate } from "react-router-dom"; // 🟢 thêm dòng này
+import { getImageUrl } from "../../../../utils/imageHelper";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -106,8 +108,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
                 {availableItems.map((item) => {
                   const id = item.product?._id ?? item.productId;
                   const name = item.product?.name ?? "Sản phẩm";
-                  const image = item.product?.image ?? "/placeholder.png";
-
+                  const image = getImageUrl(item.product?.image ?? "/placeholder.png");
                   const price = item.product?.price ?? item.price ?? 0;
                   const quantity = item.quantity ?? 1;
                   const totalPrice = price * quantity;

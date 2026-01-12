@@ -12,6 +12,7 @@ import {
 import AuthModal from "./AuthModal";
 import OrderTrackingModal from "./OrderTrackingModal";
 import type { IProduct } from "../../../../types/Product";
+import { getImageUrl } from "../../../../utils/imageHelper";
 
 interface HeaderProps {
   searchTerm: string;
@@ -173,7 +174,7 @@ const Header: React.FC<HeaderProps> = ({
                             className="w-full px-4 py-3 hover:bg-gray-50 flex items-center cursor-pointer space-x-3 border-b border-gray-50 last:border-b-0"
                           >
                             <img
-                              src={product.image_url}
+                              src={getImageUrl(product.image_url)}
                               alt={product.name}
                               className="w-12 h-12 object-cover rounded"
                             />

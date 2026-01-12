@@ -3,6 +3,7 @@ const API_BASE_URL =
 const VERSION = "v2";
 export const API_ROUTES = {
   UPLOAD: `${API_BASE_URL}/api/upload`,
+  IMAGE: `${API_BASE_URL}/uploads/products`,
   ORDER: `${API_BASE_URL}/api/orders`,
   PRODUCTS: `${API_BASE_URL}/api/${VERSION}/products`,
   SPECIFICATION: `${API_BASE_URL}/api/specifications`,

@@ -1,6 +1,7 @@
 import React from "react";
 import { Edit, Trash2 } from "lucide-react";
 import type { IProduct } from "../../../../types/Product";
+import { getImageUrl } from "../../../../utils/imageHelper";
 
 interface ProductTableProps {
   products: IProduct[];
@@ -64,7 +65,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 <td className="px-6 py-4">
                   {product.image_url ? (
                     <img
-                      src={product.image_url}
+                      src={getImageUrl(product.image_url)}
                       alt={product.name}
                       className="w-12 h-12 object-cover rounded border"
                     />
