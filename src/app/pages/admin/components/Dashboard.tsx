@@ -126,7 +126,7 @@ const Dashboard: React.FC = () => {
     const chartData = Object.keys(monthlyData)
       .sort()
       .map((key) => {
-        const [ month] = key.split("-");
+        const [, month] = key.split("-");
         const monthNames = [
           "T1",
           "T2",
