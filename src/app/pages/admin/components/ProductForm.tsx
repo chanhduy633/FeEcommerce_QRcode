@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import type { IProduct } from "../../../../types/Product";
 import { Upload, X } from "lucide-react";
 import type { UploadImageUseCase } from "../../../../domain/usecases/admin/uploadImageUseCase";
+import { getImageUrl } from "../../../../utils/imageHelper";
 
 interface ProductFormProps {
   product: IProduct | null;
@@ -38,8 +39,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
   );
 
   const [previewImage, setPreviewImage] = useState<string>(
-    product?.image_url || ""
+    getImageUrl(product?.image_url) || ""
   );
+  
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -1,6 +1,6 @@
-import React from "react";
-import { CheckCircle2, CreditCard, Loader2, Wallet } from "lucide-react";
+import { CheckCircle2, CreditCard, Wallet } from "lucide-react";
 import { useCheckoutViewModel } from "../viewmodels/checkoutViewModel";
+import { getImageUrl } from "../../utils/imageHelper";
 
 export default function CheckoutPage() {
   const viewModel = useCheckoutViewModel();
@@ -404,7 +404,7 @@ export default function CheckoutPage() {
                     >
                       <div className="relative">
                         <img
-                          src={item.product?.image || "/placeholder.png"}
+                          src={getImageUrl(item.product?.image || "/placeholder.png")}
                           alt={item.product?.name}
                           className="w-20 h-20 rounded-md object-cover"
                         />

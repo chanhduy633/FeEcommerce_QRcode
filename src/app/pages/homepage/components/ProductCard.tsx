@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ShoppingCart, Star, Heart, Eye, Loader2, Package } from "lucide-react";
 import type { IProduct } from "../../../../types/Product";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../../../../utils/imageHelper";
 
 interface ProductCardProps {
   product: IProduct;
@@ -53,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           {product.image_url ? (
             <img
-              src={product.image_url}
+              src={getImageUrl(product.image_url)}
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
