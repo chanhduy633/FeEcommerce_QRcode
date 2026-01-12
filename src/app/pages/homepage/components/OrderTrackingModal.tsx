@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { API_ROUTES } from "../../../../config/api";
 import { toast } from "sonner";
+import { getImageUrl } from "../../../../utils/imageHelper";
 
 interface OrderTrackingModalProps {
   isOpen: boolean;
@@ -248,7 +249,7 @@ const OrderTrackingModal: React.FC<OrderTrackingModalProps> = ({ isOpen, onClose
                     {orderData.items.map((item) => (
                       <div key={item.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
                         <img
-                          src={item.image || "/no-image.png"}
+                          src={getImageUrl(item.image)}
                           alt={item.name}
                           className="w-20 h-20 object-cover rounded-lg border"
                         />

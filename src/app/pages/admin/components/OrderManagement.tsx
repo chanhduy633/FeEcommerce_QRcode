@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import type { Order } from "../../../../types/Order";
 import { useOrderViewModel } from "../../../viewmodels/useOrderViewModel";
 import Pagination from "./Pagination";
+import { getImageUrl } from "../../../../utils/imageHelper";
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: "Chờ xử lý", color: "bg-yellow-100 text-yellow-800" },
@@ -365,7 +366,7 @@ export default function OrderManagement() {
                         className="flex items-center gap-4 p-2 border rounded-lg"
                       >
                         <img
-                          src={item.image || "/no-image.png"}
+                          src={getImageUrl(item.image)}
                           className="w-16 h-16 object-cover rounded"
                           alt={item.name}
                         />
