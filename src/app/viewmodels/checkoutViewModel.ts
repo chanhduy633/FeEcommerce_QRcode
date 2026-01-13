@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { provinces, districts, wards } from "vietnam-provinces";
 import { createOrderUseCase } from "../orderDependencies";
 import type { Order } from "../../types/Order";
+import { API_ROUTES } from "../../config/api";
 
 export const useCheckoutViewModel = () => {
   // ---------- Form state ----------
@@ -351,7 +352,7 @@ const handleCheckoutQR = async () => {
       try {
         // ✅ Gửi `amount` được truyền vào từ tham số, không dùng `state.totalAmount`
         const response = await fetch(
-          `http://localhost:5317/api/payment/check-sepay`,
+          API_ROUTES.PAYMENTS,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
